@@ -1,0 +1,28 @@
+e
+var c
+var p
+var i
+set_gpio_cfg 0x3FF 1
+store_var i 0i aa
+set_pgstat_chan 0
+set_pgstat_mode 2
+set_max_bandwidth 400
+set_pot_range -1 1
+set_cr 5m
+set_autoranging 5m 5m
+cell_on
+loop i < 256i
+	set_gpio i
+	set_e -1000m
+	wait 100m
+	meas_loop_lsv p c -1000m 1000m 25m 2
+		pck_start
+		pck_add p
+		pck_add c
+		pck_end
+	endloop
+	add_var i 1i
+endloop
+on_finished:
+cell_off
+

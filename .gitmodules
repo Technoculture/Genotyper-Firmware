@@ -1,9 +1,0 @@
-[submodule "samples/FlutterKiosk-POC"]
-	path = samples/FlutterKiosk-POC
-	url = https://github.com/TechnocultureResearch/FlutterKiosk-POC
-[submodule "messages/lib"]
-	path = messages/lib
-	url = https://github.com/nanopb/nanopb.git
-[submodule "docs/sample_projects/reference_projects/uwrt_mars_rover_hw_bridge"]
-	path = docs/sample_projects/reference_projects/uwrt_mars_rover_hw_bridge
-	url = https://github.com/uwrobotics/uwrt_mars_rover_hw_bridge.git

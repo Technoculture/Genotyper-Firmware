@@ -1,2 +1,0 @@
-# Gero : Genetics Robot
-

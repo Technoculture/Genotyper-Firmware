@@ -1,0 +1,38 @@
+e
+var c
+var p
+var f
+var g
+set_pgstat_chan 0
+set_pgstat_mode 2
+# Set maximum required bandwidth based on frequency * 4,
+# however since SWV measures 2 datapoints, we have to multiply the
+# bandwidth by 2 as well
+set_max_bandwidth 80
+# Set potential window.
+# The max expected potential for SWV is EEnd + EAmp * 2 – EStep.
+# This measurement would also work without this command since it
+# stays within the default potential window of -1.1 V to 1.1V
+set_pot_range -500m 690m
+# Set current range for a maximum expected current of 2 uA
+set_cr 2u
+# Disable autoranging
+set_autoranging 2u 2u
+# Turn cell on for measurement
+cell_on
+# Perform SWV
+meas_loop_swv p c f g -500m 500m 10m 100m 10
+# Send package with set potential, 
+# ”forward current – reverse current”,
+# ”forward current”
+# ”reverse current”
+pck_start
+pck_add p
+pck_add c
+pck_add f
+pck_add g
+pck_end
+endloop
+# Turn off cell when done or aborted
+on_finished:
+cell_off 
