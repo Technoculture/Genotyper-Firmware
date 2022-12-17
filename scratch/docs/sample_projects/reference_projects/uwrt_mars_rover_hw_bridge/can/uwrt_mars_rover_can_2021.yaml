@@ -1,0 +1,2016 @@
+uwrt_mars_rover_can_bus:
+  bus_frequency: 1000000
+  canid_filter_mask: 2016
+  canid_filters:
+    1568: ARM_RX_FILTER
+    1600: ARM_TX_FILTER
+    1632: SCIENCE_RX_FILTER
+    1664: SCIENCE_TX_FILTER
+    1696: GIMBAL_RX_FILTER
+    1728: GIMBAL_TX_FILTER
+    1760: PDB_RX_FILTER
+    1792: PDB_TX_FILTER
+    1824: COMMON_FILTER
+    2016: NO_MESSAGES
+  nodes:
+  - ARM
+  - GIMBAL
+  - JETSON
+  - PDB
+  - SCIENCE
+  roboteq_canids:
+    385: TPDO1
+    641: TPDO2
+    897: TPDO3
+    1153: TPDO4
+    513: RPDO1
+    769: RPDO2
+    1025: RPDO3
+    1281: RPDO4
+    1537: SDO_CMD_QUERY
+    1409: SDO_RESPONSE
+  messages:
+  - ARM_setControlMode:
+      comment: Set control mode for arm joints
+      id: 1569
+      size: 3
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 0
+      signals:
+      - ARM_turntableControlMode:
+          comment: Arm turntable control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_shoulderControlMode:
+          comment: Arm shoulder control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_elbowControlMode:
+          comment: Arm elbow control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_leftWristControlMode:
+          comment: Arm left wrist control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_rightWristControlMode:
+          comment: Arm right wrist control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_clawControlMode:
+          comment: Arm claw control mode
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: CURRENT
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+  - ARM_setJointPosition:
+      comment: Set position data for arm joints
+      id: 1570
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 100
+      signals:
+      - ARM_setTurntablePosition:
+          comment: Arm set turntable position data
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.003073972602739726
+          offset: 0.0
+      - ARM_setShoulderPosition:
+          comment: Arm set shoulder position data
+          length: 10
+          is_signed: false
+          unit: rad
+          values:
+            1023: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 0.0030739628180039137
+          offset: 0.0
+      - ARM_setElbowPosition:
+          comment: Arm set elbow position data
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.003073972602739726
+          offset: 0.0
+      - ARM_setLeftWristPosition:
+          comment: Arm set left wrist position data
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.003073972602739726
+          offset: 0.0
+      - ARM_setRightWristPosition:
+          comment: Arm set right wrist position data
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.003073972602739726
+          offset: 0.0
+      - ARM_setClawPosition:
+          comment: Arm set claw position data
+          length: 7
+          is_signed: true
+          unit: rad
+          values:
+            127: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.02493333333333333
+          offset: 0.0
+      - ARM_setToolTipPosition:
+          comment: Arm set tool tip position data
+          length: 7
+          is_signed: false
+          unit: rad
+          values:
+            127: SNA
+          min: 0
+          max: 3.14159
+          scale: 0.02493325396825397
+          offset: 0
+  - ARM_setJointAngularVelocity:
+      comment: Set velocity data for arm joints
+      id: 1571
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 100
+      signals:
+      - ARM_setTurntableAngularVelocity:
+          comment: Arm set turntable angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -0.6
+          max: 0.6
+          scale: 0.0011741682974559687
+          offset: 0.0
+      - ARM_setShoulderAngularVelocity:
+          comment: Arm set shoulder angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -0.05
+          max: 0.05
+          scale: 9.784735812133073e-05
+          offset: 0.0
+      - ARM_setElbowAngularVelocity:
+          comment: Arm set elbow angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -1.8
+          max: 1.8
+          scale: 0.0035225048923679062
+          offset: 0.0
+      - ARM_setLeftWristAngularVelocity:
+          comment: Arm set left wrist angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -7.1
+          max: 7.1
+          scale: 0.013894324853228963
+          offset: 0.0
+      - ARM_setRightWristAngularVelocity:
+          comment: Arm set right wrist angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -7.1
+          max: 7.1
+          scale: 0.013894324853228963
+          offset: 0.0
+      - ARM_setClawAngularVelocity:
+          comment: Arm set claw angular velocity
+          length: 10
+          is_signed: true
+          unit: rad/s
+          values:
+            1023: SNA
+          min: -30.0
+          max: 30.0
+          scale: 0.05870841487279843
+          offset: 0.0
+  - ARM_setJointCurrent:
+      comment: Set current data for arm joints
+      id: 1572
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 100
+      signals:
+      - ARM_setTurntableCurrent:
+          comment: Arm set turntable current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -53.0
+          max: 53.0
+          scale: 0.10371819960861056
+          offset: 0.0
+      - ARM_setShoulderCurrent:
+          comment: Arm set shoulder current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -5.0
+          max: 5.0
+          scale: 0.009784735812133072
+          offset: 0.0
+      - ARM_setElbowCurrent:
+          comment: Arm set elbow current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -25.0
+          max: 25.0
+          scale: 0.04892367906066536
+          offset: 0.0
+      - ARM_setLeftWristCurrent:
+          comment: Arm set left wrist current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -5.5
+          max: 5.5
+          scale: 0.010763209393346379
+          offset: 0.0
+      - ARM_setRightWristCurrent:
+          comment: Arm set right wrist current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -5.5
+          max: 5.5
+          scale: 0.010763209393346379
+          offset: 0.0
+      - ARM_setClawCurrent:
+          comment: Arm set claw current
+          length: 10
+          is_signed: true
+          unit: A
+          values:
+            1023: SNA
+          min: -3.0
+          max: 3.0
+          scale: 0.005870841487279843
+          offset: 0.0
+  - ARM_setJointPIDParams:
+      comment: Set arm joint PID parameters
+      id: 1573
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 0
+      signals:
+      - ARM_jointPIDID:
+          comment: Arm joint ID
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: TURNTABLE
+            1: SHOULDER
+            2: ELBOW
+            3: LEFT_WRIST
+            4: RIGHT_WRIST
+            5: CLAW
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_jointPIDProportionalGain:
+          comment: Arm joint PID proportional gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - ARM_jointPIDIntegralGain:
+          comment: Arm joint PID integral gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - ARM_jointPIDDerivativeGain:
+          comment: Arm joint PID derivative gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - ARM_jointPIDDeadzone:
+          comment: Arm joint PID deadzone
+          length: 13
+          is_signed: false
+          unit: ''
+          values:
+            8191: SNA
+          min: 0.0
+          max: 100.0
+          scale: 0.01221001221001221
+          offset: 0.0
+  - ARM_reportJointPosition:
+      comment: Arm report joint position data
+      id: 1600
+      size: 8
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - ARM_reportTurntablePosition:
+          comment: Arm turntable position
+          length: 12
+          is_signed: true
+          unit: rad
+          values:
+            4095: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.0007673668783585735
+          offset: 0.0
+      - ARM_reportShoulderPosition:
+          comment: Arm shoulder position
+          length: 12
+          is_signed: false
+          unit: rad
+          values:
+            4095: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 0.0007673644357596483
+          offset: 0.0
+      - ARM_reportElbowPosition:
+          comment: Arm elbow position
+          length: 12
+          is_signed: true
+          unit: rad
+          values:
+            4095: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.0007673668783585735
+          offset: 0.0
+      - ARM_reportLeftWristPosition:
+          comment: Arm left wrist position
+          length: 8
+          is_signed: true
+          unit: rad
+          values:
+            255: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.012368503937007874
+          offset: 0.0
+      - ARM_reportRightWristPosition:
+          comment: Arm right wrist position
+          length: 8
+          is_signed: true
+          unit: rad
+          values:
+            255: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.012368503937007874
+          offset: 0.0
+      - ARM_reportClawPosition:
+          comment: Arm claw position
+          length: 8
+          is_signed: true
+          unit: rad
+          values:
+            255: SNA
+          min: -1.5708
+          max: 1.5708
+          scale: 0.012368503937007874
+          offset: 0.0
+  - ARM_reportJointAngularVelocity:
+      comment: Arm report joint angular velocity data
+      id: 1601
+      size: 8
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - ARM_reportTurntableAngularVelocity:
+          comment: Arm turntable angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -0.6
+          max: 0.6
+          scale: 0.0011741682974559687
+          offset: 0.0
+      - ARM_reportShoulderAngularVelocity:
+          comment: Arm shoulder angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -0.05
+          max: 0.05
+          scale: 9.784735812133073e-05
+          offset: 0.0
+      - ARM_reportElbowAngularVelocity:
+          comment: Arm elbow angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -1.8
+          max: 1.8
+          scale: 0.0035225048923679062
+          offset: 0.0
+      - ARM_reportLeftWristAngularVelocity:
+          comment: Arm left wrist angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -7.1
+          max: 7.1
+          scale: 0.013894324853228963
+          offset: 0.0
+      - ARM_reportRightWristAngularVelocity:
+          comment: Arm right wrist angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -7.1
+          max: 7.1
+          scale: 0.013894324853228963
+          offset: 0.0
+      - ARM_reportClawAngularVelocity:
+          comment: Arm claw angular velocity
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -30.0
+          max: 30.0
+          scale: 0.05870841487279843
+          offset: 0.0
+  - ARM_reportJointCurrent:
+      comment: Arm report joint angular current
+      id: 1602
+      size: 8
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - ARM_reportTurntableCurrent:
+          comment: Arm turntable current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -53.0
+          max: 53.0
+          scale: 0.10371819960861056
+          offset: 0.0
+      - ARM_reportShoulderCurrent:
+          comment: Arm shoulder current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -5.0
+          max: 5.0
+          scale: 0.009784735812133072
+          offset: 0.0
+      - ARM_reportElbowCurrent:
+          comment: Arm elbow current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -25.0
+          max: 25.0
+          scale: 0.04892367906066536
+          offset: 0.0
+      - ARM_reportLeftWristCurrent:
+          comment: Arm left wrist current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -5.5
+          max: 5.5
+          scale: 0.010763209393346379
+          offset: 0.0
+      - ARM_reportRightWristCurrent:
+          comment: Arm right wrist current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -5.5
+          max: 5.5
+          scale: 0.010763209393346379
+          offset: 0.0
+      - ARM_reportClawCurrent:
+          comment: Arm claw current
+          length: 10
+          is_signed: true
+          unit: rad
+          values:
+            1023: SNA
+          min: -3.0
+          max: 3.0
+          scale: 0.005870841487279843
+          offset: 0.0
+  - ARM_reportFaults:
+      comment: Arm fault conditions
+      id: 1603
+      size: 7
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - ARM_turntableEncoderState:
+          comment: Arm turntable encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_turntableCurrentSensorState:
+          comment: Arm turntable current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_shoulderEncoderState:
+          comment: Arm shoulder encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_shoulderCurrentSensorState:
+          comment: Arm shoulder current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_elbowEncoderState:
+          comment: Arm elbow encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_elbowCurrentSensorState:
+          comment: Arm elbow current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_leftWristEncoderState:
+          comment: Arm left wrist encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_leftWristCurrentSensorState:
+          comment: Arm left wrist current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_rightWristEncoderState:
+          comment: Arm right wrist encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_rightWristCurrentSensorState:
+          comment: Arm shoulder current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_clawEncoderState:
+          comment: Arm claw encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_clawCurrentSensorState:
+          comment: Arm claw current sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - ARM_numCANRXFaults:
+          comment: Arm number of CAN RX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+      - ARM_numCANTXFaults:
+          comment: Arm number of CAN TX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+  - ARM_reportACK:
+      comment: Arm report ACKs to one-shot commands
+      id: 1604
+      size: 1
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 0
+      signals:
+      - ARM_ACK:
+          comment: Arm ACKs
+          length: 8
+          is_signed: false
+          unit: ''
+          values:
+            0: ARM_RESET_ACK
+            1: ARM_SET_CONTROL_MODE_ACK
+            2: ARM_SET_JOINT_PID_PARAMS_ACK
+            3: CAN_BUS_SWITCH_ACK
+            255: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0
+  - ARM_reportDiagnostics:
+      comment: Arm report diagnostic information
+      id: 1605
+      size: 8
+      senders:
+      - ARM
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - ARM_reportNumStreamedMsgsReceived:
+          comment: Arm report number of streamed CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+      - ARM_reportNumOneShotMsgsReceived:
+          comment: Arm report number of one-shot CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+  - ARM_setJointSafetyCheck:
+      comment: Set current limit, angular velocity limit, and limit switch safety
+        checks for an arm joint
+      id: 1606
+      size: 1
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      frequency: 0
+      signals:
+      - ARM_safetyCheckJointID:
+          comment: The joint ID
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: TURNTABLE
+            1: SHOULDER
+            2: ELBOW
+            3: LEFT_WRIST
+            4: RIGHT_WRIST
+            5: CLAW
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - ARM_jointCurrentCheck:
+          comment: Whether or not to activate current check for this joint
+          length: 1
+          is_signed: false
+          unit: ''
+          values:
+            0: CHECK_OFF
+            1: CHECK_ON
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 0.0
+      - ARM_jointAngularVelocityCheck:
+          comment: Whether or not to activate angular velocity check for this joint
+          length: 1
+          is_signed: false
+          unit: ''
+          values:
+            0: CHECK_OFF
+            1: CHECK_ON
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 0.0
+      - ARM_jointLimitSwitchCheck:
+          comment: Whether or not to activate limit switch check for this joint
+          length: 1
+          is_signed: false
+          unit: ''
+          values:
+            0: CHECK_OFF
+            1: CHECK_ON
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 0.0
+  - SCIENCE_setControlMode:
+      comment: Set control mode for science joints
+      id: 1632
+      size: 1
+      senders:
+      - JETSON
+      receivers:
+      - SCIENCE
+      frequency: 0
+      signals:
+      - SCIENCE_genevaControlMode:
+          comment: Science geneva mechanism control mode
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - SCIENCE_elevatorControlMode:
+          comment: Science elevator control mode
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+  - SCIENCE_setJointPosition:
+      comment: Science set joint position
+      id: 1633
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - SCIENCE
+      frequency: 100
+      signals:
+      - SCIENCE_setGenevaPosition:
+          comment: Set science geneva mechanism position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_setElevatorPosition:
+          comment: Set science elevator position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_setCoverPosition:
+          comment: Set science cover position
+          length: 16
+          is_signed: false
+          unit: rad
+          values:
+            65535: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 4.793832209234901e-05
+          offset: 0.0
+      - SCIENCE_setShovelPosition:
+          comment: Set science shovel position
+          length: 16
+          is_signed: false
+          unit: rad
+          values:
+            65535: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 4.793832209234901e-05
+          offset: 0.0
+  - SCIENCE_setJointAngularVelocity:
+      comment: Science set joint angular velocity
+      id: 1634
+      size: 4
+      senders:
+      - JETSON
+      receivers:
+      - SCIENCE
+      frequency: 100
+      signals:
+      - SCIENCE_setGenevaAngularVelocity:
+          comment: Science set geneva mechanism angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_setElevatorAngularVelocity:
+          comment: Science set elevator angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+  - SCIENCE_setJointPIDParams:
+      comment: Set science joint PID parameters
+      id: 1635
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - SCIENCE
+      frequency: 0
+      signals:
+      - SCIENCE_jointPIDID:
+          comment: Science joint ID
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: GENEVA
+            1: ELEVATOR
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - SCIENCE_jointPIDProportionalGain:
+          comment: Science joint PID proportional gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - SCIENCE_jointPIDIntegralGain:
+          comment: Science joint PID integral gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - SCIENCE_jointPIDDerivativeGain:
+          comment: Science joint PID derivative gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - SCIENCE_jointPIDDeadzone:
+          comment: Science joint PID deadzone
+          length: 13
+          is_signed: false
+          unit: ''
+          values:
+            8191: SNA
+          min: 0.0
+          max: 100.0
+          scale: 0.01221001221001221
+          offset: 0.0
+  - SCIENCE_reportJointData:
+      comment: Science report joint positions and angular velocities
+      id: 1664
+      size: 8
+      senders:
+      - SCIENCE
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - SCIENCE_reportGenevaPosition:
+          comment: Science report geneva mechanism position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_reportElevatorPosition:
+          comment: Science report elevator position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_reportGenevaAngularVelocity:
+          comment: Science report geneva mechanism angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+      - SCIENCE_reportElevatorAngularVelocity:
+          comment: Science report elevator angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -10.0
+          max: 10.0
+          scale: 0.0003051850947599719
+          offset: 0.0
+  - SCIENCE_reportSensorData:
+      comment: Science report sensor data
+      id: 1665
+      size: 32
+      senders:
+      - SCIENCE
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - SCIENCE_moistureData:
+          comment: Science moisture sensor data
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 100.0
+          scale: 0.0015259254737998596
+          offset: 0.0
+      - SCIENCE_temperatureData:
+          comment: Science temperature sensor data
+          length: 16
+          is_signed: true
+          unit: Celsius
+          values:
+            32767: SNA
+          min: -50.0
+          max: 100.0
+          scale: 0.0022888882106997894
+          offset: 25.0
+  - SCIENCE_reportFaults:
+      comment: Science fault conditions
+      id: 1666
+      size: 5
+      senders:
+      - SCIENCE
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - SCIENCE_genevaEncoderState:
+          comment: Science geneva mechanism encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - SCIENCE_elevatorEncoderState:
+          comment: Science elevator encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - SCIENCE_moistureSensorState:
+          comment: Science moisture sensor state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - SCIENCE_numCANRXFaults:
+          comment: Science number of CAN RX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+      - SCIENCE_numCANTXFaults:
+          comment: Science number of CAN TX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+  - SCIENCE_reportACK:
+      comment: Science report ACKs to one-shot commands
+      id: 1667
+      size: 1
+      senders:
+      - SCIENCE
+      receivers:
+      - JETSON
+      frequency: 0
+      signals:
+      - SCIENCE_ACK:
+          comment: Science ACKs
+          length: 8
+          is_signed: false
+          unit: ''
+          values:
+            0: SCIENCE_SET_CONTROL_MODE_ACK
+            1: SCIENCE_SET_JOINT_PID_PARAMS_ACK
+            2: CAN_BUS_SWITCH_ACK
+            255: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0
+  - SCIENCE_reportDiagnostics:
+      comment: Science report diagnostic information
+      id: 1668
+      size: 8
+      senders:
+      - SCIENCE
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - SCIENCE_reportNumStreamedMsgsReceived:
+          comment: Science report number of streamed CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+      - SCIENCE_reportNumOneShotMsgsReceived:
+          comment: Science report number of one-shot CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+  - GIMBAL_setControlMode:
+      comment: Set control mode for gimbal joints
+      id: 1696
+      size: 1
+      senders:
+      - JETSON
+      receivers:
+      - GIMBAL
+      frequency: 0
+      signals:
+      - GIMBAL_panControlMode:
+          comment: Gimbal pan control mode
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPEN_LOOP
+            1: POSITION
+            2: VELOCITY
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+  - GIMBAL_setJointPosition:
+      comment: Gimbal set joint position
+      id: 1697
+      size: 6
+      senders:
+      - JETSON
+      receivers:
+      - GIMBAL
+      frequency: 100
+      signals:
+      - GIMBAL_setPanPosition:
+          comment: Gimbal set pan position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -12.0
+          max: 12.0
+          scale: 0.0003662221137119663
+          offset: 0.0
+      - GIMBAL_setPitchPosition:
+          comment: Gimbal set pitch position
+          length: 16
+          is_signed: false
+          unit: rad
+          values:
+            65535: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 4.793832209234901e-05
+          offset: 0.0
+      - GIMBAL_setRollPosition:
+          comment: Gimbal set roll position
+          length: 16
+          is_signed: false
+          unit: rad
+          values:
+            65535: SNA
+          min: 0.0
+          max: 3.14159
+          scale: 4.793832209234901e-05
+          offset: 0.0
+  - GIMBAL_setJointAngularVelocity:
+      comment: Gimbal set joint angular velocity
+      id: 1698
+      size: 2
+      senders:
+      - JETSON
+      receivers:
+      - GIMBAL
+      frequency: 100
+      signals:
+      - GIMBAL_setPanAngularVelocity:
+          comment: Gimbal set pan angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -6.0
+          max: 6.0
+          scale: 0.00018311105685598315
+          offset: 0.0
+  - GIMBAL_setJointPIDParams:
+      comment: Set gimbal joint PID parameters
+      id: 1699
+      size: 8
+      senders:
+      - JETSON
+      receivers:
+      - GIMBAL
+      frequency: 0
+      signals:
+      - GIMBAL_jointPIDID:
+          comment: Gimbal joint ID
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: PAN
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+      - GIMBAL_jointPIDProportionalGain:
+          comment: Gimbal joint PID proportional gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - GIMBAL_jointPIDIntegralGain:
+          comment: Gimbal joint PID integral gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - GIMBAL_jointPIDDerivativeGain:
+          comment: Gimbal joint PID derivative gain
+          length: 16
+          is_signed: false
+          unit: ''
+          values:
+            65535: SNA
+          min: 0.0
+          max: 10000.0
+          scale: 0.15259254737998595
+          offset: 0.0
+      - GIMBAL_jointPIDDeadzone:
+          comment: Gimbal joint PID deadzone
+          length: 13
+          is_signed: false
+          unit: ''
+          values:
+            8191: SNA
+          min: 0.0
+          max: 100.0
+          scale: 0.01221001221001221
+          offset: 0.0
+  - GIMBAL_reportJointData:
+      comment: Gimbal report joint data
+      id: 1728
+      size: 4
+      senders:
+      - GIMBAL
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - GIMBAL_reportPanPosition:
+          comment: Gimbal report pan position
+          length: 16
+          is_signed: true
+          unit: rad
+          values:
+            32767: SNA
+          min: -12.0
+          max: 12.0
+          scale: 0.0003662221137119663
+          offset: 0.0
+      - GIMBAL_reportPanAngularVelocity:
+          comment: Gimbal report pan angular velocity
+          length: 16
+          is_signed: true
+          unit: rad/s
+          values:
+            32767: SNA
+          min: -6.0
+          max: 6.0
+          scale: 0.00018311105685598315
+          offset: 0.0
+  - GIMBAL_reportFaults:
+      comment: Gimbal fault conditions
+      id: 1729
+      size: 5
+      senders:
+      - GIMBAL
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - GIMBAL_panEncoderState:
+          comment: Gimbal pan encoder state
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - GIMBAL_numCANRXFaults:
+          comment: Gimbal number of CAN RX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+      - GIMBAL_numCANTXFaults:
+          comment: Gimbal number of CAN TX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+  - GIMBAL_reportACK:
+      comment: Gimbal report ACKs to one-shot commands
+      id: 1730
+      size: 1
+      senders:
+      - GIMBAL
+      receivers:
+      - JETSON
+      frequency: 0
+      signals:
+      - GIMBAL_ACK:
+          comment: Gimbal ACKs
+          length: 8
+          is_signed: false
+          unit: ''
+          values:
+            0: GIMBAL_SET_CONTROL_MODE_ACK
+            1: GIMBAL_SET_JOINT_PID_PARAMS_ACK
+            2: CAN_BUS_SWITCH_ACK
+            255: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0
+  - GIMBAL_reportDiagnostics:
+      comment: Gimbal report diagnostic information
+      id: 1731
+      size: 8
+      senders:
+      - GIMBAL
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - GIMBAL_reportNumStreamedMsgsReceived:
+          comment: Gimbal report number of streamed CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+      - GIMBAL_reportNumOneShotMsgsReceived:
+          comment: Gimbal report number of one-shot CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+  - PDB_setLEDMatrix:
+      comment: PDB set LED matrix state
+      id: 1760
+      size: 1
+      senders:
+      - JETSON
+      receivers:
+      - PDB
+      frequency: 0
+      signals:
+      - PDB_LEDMatrixState:
+          comment: PDB LED matrix state
+          length: 3
+          is_signed: false
+          unit: ''
+          values:
+            0: SOLID_RED
+            1: SOLID_BLUE
+            2: FLASHING_GREEN
+            3: false
+            7: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 6.0
+  - PDB_reportSensorData:
+      comment: PDB report sensor data
+      id: 1792
+      size: 8
+      senders:
+      - PDB
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - PDB_ultrasonicSensor1Data:
+          comment: PDB ultrasonic sensor 1 data
+          length: 16
+          is_signed: false
+          unit: m
+          values:
+            65535: SNA
+          min: 0.0
+          max: 500.0
+          scale: 0.007629627368999298
+          offset: 0.0
+      - PDB_ultrasonicSensor2Data:
+          comment: PDB ultrasonic sensor 2 data
+          length: 16
+          is_signed: false
+          unit: m
+          values:
+            65535: SNA
+          min: 0.0
+          max: 500.0
+          scale: 0.007629627368999298
+          offset: 0.0
+      - PDB_ultrasonicSensor3Data:
+          comment: PDB ultrasonic sensor 3 data
+          length: 16
+          is_signed: false
+          unit: m
+          values:
+            65535: SNA
+          min: 0.0
+          max: 500.0
+          scale: 0.007629627368999298
+          offset: 0.0
+      - PDB_ultrasonicSensor4Data:
+          comment: PDB ultrasonic sensor 4 data
+          length: 16
+          is_signed: false
+          unit: m
+          values:
+            65535: SNA
+          min: 0.0
+          max: 500.0
+          scale: 0.007629627368999298
+          offset: 0.0
+  - PDB_reportFaults:
+      comment: PDB report fault conditions
+      id: 1793
+      size: 6
+      senders:
+      - PDB
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - PDB_jetsonStatus:
+          comment: PDB Jetson power status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_armPowerStatus:
+          comment: PDB arm power status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_sciencePowerStatus:
+          comment: PDB science power status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_gimbalPowerStatus:
+          comment: PDB gmibal power status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: FAULT
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_VBATRailStatus:
+          comment: PDB VBAT rail status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: OVERVOLTAGE
+            2: UNDERVOLTAGE
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_17VRailStatus:
+          comment: PDB 17V rail status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: OVERVOLTAGE
+            2: UNDERVOLTAGE
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_5VRailStatus:
+          comment: PDB 5V rail status
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: OPERATIONAL
+            1: OVERVOLTAGE
+            2: UNDERVOLTAGE
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+      - PDB_numCANRXFaults:
+          comment: PDB number of CAN RX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+      - PDB_numCANTXFaults:
+          comment: PDB number of CAN TX faults
+          length: 16
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 65534.0
+  - PDB_reportACK:
+      comment: PDB report ACKs to one-shot commands
+      id: 1794
+      size: 1
+      senders:
+      - PDB
+      receivers:
+      - JETSON
+      frequency: 0
+      signals:
+      - PDB_ACK:
+          comment: PDB ACKs
+          length: 8
+          is_signed: false
+          unit: ''
+          values:
+            0: PDB_SET_LED_MATRIX_ACK
+            1: CAN_BUS_SWITCH_ACK
+            255: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0
+  - PDB_reportDiagnostics:
+      comment: PDB report diagnostic information
+      id: 1795
+      size: 8
+      senders:
+      - PDB
+      receivers:
+      - JETSON
+      frequency: 100
+      signals:
+      - PDB_reportNumStreamedMsgsReceived:
+          comment: PDB report number of streamed CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+      - PDB_reportNumOneShotMsgsReceived:
+          comment: PDB report number of one-shot CAN messages received
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+  - COMMON_switchCANBus:
+      comment: Notifies all boards to switch to the specified CAN bus in the dual-bus
+        system
+      id: 1824
+      size: 1
+      senders:
+      - JETSON
+      receivers:
+      - ARM
+      - GIMBAL
+      - PDB
+      - SCIENCE
+      frequency: 0
+      signals:
+      - COMMON_CANBusID:
+          comment: CAN bus ID
+          length: 2
+          is_signed: false
+          unit: ''
+          values:
+            0: CAN_BUS_1
+            1: CAN_BUS_2
+            3: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 2.0
+  - COMMON_debugMessage1:
+      comment: CAN message for debugging or placeholder purposes
+      id: 1825
+      size: 4
+      senders:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      receivers:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      frequency: 0
+      signals:
+      - COMMON_debugSignal1:
+          comment: CAN debug signal
+          length: 32
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 4294967294.0
+  - COMMON_debugMessage2:
+      comment: CAN message for debugging or placeholder purposes
+      id: 1826
+      size: 1
+      senders:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      receivers:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      frequency: 0
+      signals:
+      - COMMON_debugSignal2:
+          comment: CAN debug signal
+          length: 8
+          is_signed: false
+          unit: ''
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0
+  - COMMON_debugMessage3:
+      comment: CAN message for debugging or placeholder purposes
+      id: 1827
+      size: 1
+      senders:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      receivers:
+      - ARM
+      - GIMBAL
+      - JETSON
+      - PDB
+      - SCIENCE
+      frequency: 0
+      signals:
+      - COMMON_debugSignal3:
+          comment: CAN debug signal
+          length: 8
+          is_signed: false
+          unit: ''
+          values:
+            0: DEBUG_VALUE_0
+            1: DEBUG_VALUE_1
+            2: DEBUG_VALUE_2
+            3: DEBUG_VALUE_3
+            4: DEBUG_VALUE_4
+            5: DEBUG_VALUE_5
+            6: DEBUG_VALUE_6
+            7: DEBUG_VALUE_7
+            255: SNA
+          scale: 1.0
+          offset: 0.0
+          min: 0.0
+          max: 254.0

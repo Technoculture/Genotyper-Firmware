@@ -1,0 +1,14 @@
+uwrt_mars_rover_can_bus:
+  bus_frequency: 1000000
+  canid_filter_mask: 2016
+  canid_filters:
+    1824: COMMON_FILTER
+    2016: NO_MESSAGES
+  nodes:
+  - GIMBAL
+  - JETSON
+  - PDB
+  - SCIENCE
+  roboteq_canids:
+    0: TEMP
+  messages: null
