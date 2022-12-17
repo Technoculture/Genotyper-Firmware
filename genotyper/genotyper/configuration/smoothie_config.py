@@ -3,7 +3,7 @@ from typing import Dict
 import os
 from json import dump
 # TODO: is this seperation needed?
-from gero.configuration.type import ConfigFilenameError
+from genotyper.configuration.type import ConfigFilenameError
 
 
 def _deserialize_smoothie_config(config_path: str) -> Dict[str, str]:
@@ -89,7 +89,7 @@ def smoothie_config_to_dict(config_file: str) -> Dict[str, str]:
     return _deserialize_smoothie_config(config_file)
 
 
-def smoothie_config_to_json(config_file: str, output_file: str):
+def smoothie_config_to_json(config_file: str, output_file: str) -> None:
     """Converts the `config.txt` file for smoothieware to a json file
 
     Args:

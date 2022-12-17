@@ -1,12 +1,11 @@
 import logging
-from logging.config import dictConfig
 import sys
 from typing import Any, Dict
 
 # from gero.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 
-def getConsoleLogger():
+def getConsoleLogger() -> None:
     logging.basicConfig(
         format="%(asctime)s %(levelname)s (%(lineno)s)|> %(message)s",
         datefmt='%I:%M:%S',
@@ -14,7 +13,7 @@ def getConsoleLogger():
         handlers=[logging.StreamHandler(sys.stdout)]
     )
 
-    return logging
+    # return logging
 
 
 def host_config(level_value: int) -> Dict[str, Any]:

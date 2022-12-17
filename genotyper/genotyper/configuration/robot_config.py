@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel, validator
 from json import load
 # TODO: Is this seperation needed?
-from gero.configuration.type import InvalidBaudRateError
+from genotyper.configuration.type import InvalidBaudRateError
 # from enum import Enum, IntEnum
 
 

@@ -1,7 +1,9 @@
-from gero.config import settings
-from gero.util import logging_config
+import logging
+from genotyper.util import logging_config
 
-log = logging_config.getConsoleLogger()
+logging_config.getConsoleLogger()
+
+log = logging.getLogger("Genotyper")
 
 log.info("Initializing the Library")
 # print(f"Libray running in {settings.name} mode.")  # from settings.toml

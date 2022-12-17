@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ConfigFilenameError(Exception):
-    def __str__(self):
+    def __str__(self) -> str:
         return "A path (or filename) with the name `config.txt` is expected"
 
 

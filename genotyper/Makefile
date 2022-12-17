@@ -1,6 +1,10 @@
+SRC_MAIN_PACKAGE = genotyper
 
-DOCS_BUILD_DIR = docs/build
-SRC_MAIN_PACKAGE = src/gero
+run:
+	pipenv run python -m $(SRC_MAIN_PACKAGE)
 
-docs:
-	sphinx-apidoc -F -o $(DOCS_BUILD_DIR) $(SRC_MAIN_PACKAGE)
+test:
+	pipenv run pytest
+
+type:
+	pipenv run mypy .

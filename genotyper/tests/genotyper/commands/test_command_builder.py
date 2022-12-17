@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pytest
-from gero.drivers.command_builder import CommandBuilder
+from genotyper.drivers.command_builder import CommandBuilder
 
 
 def test_builder_create_command_with_terminator() -> None:

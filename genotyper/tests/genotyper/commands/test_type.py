@@ -1,10 +1,10 @@
 
 # from gero.commands.types import init
-def test_execute():
+def test_execute() -> None:
     assert True
 
 
-def test_init():
+def test_init() -> None:
     # types.init()
     # init()
-    return True
+    assert True
