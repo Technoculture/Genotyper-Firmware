@@ -3,7 +3,7 @@ from typing import Dict
 import os
 from json import dump
 # TODO: is this seperation needed?
-from genotyper.configuration.type import ConfigFilenameError
+from genotyper.configuration.error import ConfigFilenameError
 
 
 def _deserialize_smoothie_config(config_path: str) -> Dict[str, str]:
