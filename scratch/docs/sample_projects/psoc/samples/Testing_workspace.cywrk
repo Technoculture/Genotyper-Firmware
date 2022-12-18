@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CyXmlSerializer>
+<!--This file is machine generated and read. It is not intended to be edited by hand.-->
+<!--Due to this, there is no schema for this file.-->
+<CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="Testing_workspace" persistent="Testing_workspace.cywrk" platform="NOT_USED">
+<current_project name=".\DNA_quantification2.cydsn\DNA_quantification2.cyprj" />
+<wrkspc_folders />
+<files />
+<projects>
+<v>.\LED_Blink.cydsn\LED_Blink.cyprj</v>
+<v>.\LED_Brightness_ADC_PWM.cydsn\LED_Brightness_ADC_PWM.cyprj</v>
+<v>.\USB_Serial.cydsn\USB_Serial.cyprj</v>
+<v>.\OP_AMP.cydsn\OP_AMP.cyprj</v>
+<v>.\Trans_Impedance_Amplifier.cydsn\Trans_Impedance_Amplifier.cyprj</v>
+<v>.\PhotoDiode.cydsn\PhotoDiode.cyprj</v>
+<v>.\DNA_quantification.cydsn\DNA_quantification.cyprj</v>
+<v>.\DNA_quantification2.cydsn\DNA_quantification2.cyprj</v>
+</projects>
+<workspace_id v="949c7dd6-da82-4494-92e4-5ca503a7d934" />
+<WriteAppVersionLastSavedWith v="4.4.0.80" />
+<WriteAppMarketingVersionLastSavedWith v="4.4" />
+<CyGuid_dcbd9771-0334-43dc-9cc3-fe99dc3c5316 type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize+CyPrjDependencyList" version="4">
+<wrkspc_dependencies />
+</CyGuid_dcbd9771-0334-43dc-9cc3-fe99dc3c5316>
+<CyGuid_63b68103-67f5-4406-8da6-5c8625765b82 type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize+CyIgnoredSystemDepsList" version="1">
+<wrkspc_dependencies />
+</CyGuid_63b68103-67f5-4406-8da6-5c8625765b82>
+</CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd>
+</CyXmlSerializer>

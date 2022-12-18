@@ -1,0 +1,123 @@
+{
+    "whome": {
+        "name": "gero",
+        "identity": {
+            "firmware_version": 1.0
+        }
+    },
+    "modules": {
+        "orchestrator": {
+            "identity": {
+                "model": "min",
+                "version": 1.0,
+                "firmware_version": 1.0
+            },
+            "serial": {
+                "emulated_port_addr": "/dev/grOrch1",
+                "serial_number": "ORCH1001",
+                "baud_rate": 9600
+            }
+        },
+        "resource_managers": {
+            "chip_manager": {
+                "identity": {
+                    "model": "min",
+                    "version": 1.0,
+                    "firmware_version": 1.0
+                },
+                "serial": {
+                    "emulated_port_addr": "/dev/grChipMan1",
+                    "serial_number": "CHPM1001",
+                    "baud_rate": 115200
+                }
+            },
+            "swab_manager": {
+                "identity": {
+                    "model": "small",
+                    "version": 1.0,
+                    "firmware_version": 1.0
+                },
+                "serial": {
+                    "emulated_port_addr": "/dev/grSwabMan1",
+                    "serial_number": "SWBM1001",
+                    "baud_rate": 9600
+                }
+            },
+            "input_queue_manager": {
+                "identity": {
+                    "model": "small",
+                    "version": 1.0,
+                    "firmware_version": 1.0
+                },
+                "serial": {
+                    "emulated_port_addr": "/dev/grInqMan1",
+                    "serial_number": "INQM1001",
+                    "baud_rate": 9600
+                }
+            },
+            "solution_managers": [
+                {
+                    "identity": {
+                        "model": "peltier-cooled",
+                        "version": 1.0,
+                        "firmware_version": 1.0
+                    },
+                    "serial": {
+                        "emulated_port_addr": "/dev/grSolMan1",
+                        "serial_number": "SOLM1001",
+                        "baud_rate": 9600
+                    },
+                    "reagent_id": "hcl-0.1M"
+                }
+            ]
+        },
+        "instruments": {
+            "chip_centrifuges": [
+                {
+                    "identity": {
+                        "model": "low_speed",
+                        "version": 1.0,
+                        "firmware_version": 1.0
+                    },
+                    "serial": {
+                        "emulated_port_addr": "/dev/grCentri1",
+                        "serial_number": "CENT1001",
+                        "baud_rate": 115200
+                    }
+                },
+                {
+                    "identity": {
+                        "model": "low_speed",
+                        "version": 1.0,
+                        "firmware_version": 1.0
+                    },
+                    "serial": {
+                        "emulated_port_addr": "/dev/grCentri2",
+                        "serial_number": "CENT1002",
+                        "baud_rate": 9600
+                    }
+                }
+            ],
+            "standalone_na_amplifiers": []
+        }
+    },
+    "layout": [
+        {
+            "name": "chip_centrifuges",
+            "serial_number": "",
+            "offset": {
+                "x": 10,
+                "y": 100,
+                "z": 120
+            }
+        },
+        {
+            "name": "chip_centrifuges",
+            "serial_number": ""
+        },
+        {
+            "name": "input_queue_manager",
+            "rotation": 90
+        }
+    ]
+}

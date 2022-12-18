@@ -1,0 +1,9 @@
+*.hex
+*.o
+*.elf
+*.bin
+**/Debug/
+**/codegentemp/
+**/Generated_Source/
+**/Backup/
+

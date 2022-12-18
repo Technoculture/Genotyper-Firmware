@@ -1,3 +1,0 @@
-config BOARD_SOM_NRF52811
-	bool "SOM NRF52811"
-	depends on SOC_NRF52811_QFAA

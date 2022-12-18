@@ -1,2 +1,0 @@
-zephyr_compile_definitions(DEVELOP_IN_NRF52840)
-zephyr_compile_definitions(NRFX_COREDEP_DELAY_US_LOOP_CYCLES=3)

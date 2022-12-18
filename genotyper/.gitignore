@@ -1,0 +1,6 @@
+dist/
+**/.*cache/
+**/.idea/
+
+# Ignore dynaconf secret files
+.secrets.*

@@ -1,0 +1,3 @@
+if SENSOR
+source "tmp100/Kconfig"
+endif # SENSOR

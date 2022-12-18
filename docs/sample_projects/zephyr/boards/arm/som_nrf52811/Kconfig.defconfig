@@ -1,9 +1,0 @@
-if BOARD_SOM_NRF52811
-
-config BOARD
-	default "som_nrf52811"
-
-config BT_CTLR
-	default BT
-
-endif # BOARD_SOM_NRF52811

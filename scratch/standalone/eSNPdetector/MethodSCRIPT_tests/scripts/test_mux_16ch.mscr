@@ -1,0 +1,35 @@
+e
+var c
+var p
+var i
+#set all 10 gpio to output (including I2C pins)
+set_gpio_cfg 0x3FF 1
+#store integer "0" in variable i
+store_var i 0i aa
+#channel 0, low power mode, 400 Hz BW, potential range -1V to 1V, 5mA fixed CR
+set_pgstat_chan 0
+set_pgstat_mode 2
+set_max_bandwidth 400
+set_pot_range -1 1
+set_cr 5m
+set_autoranging 5m 5m
+cell_on
+loop i <= 0xFFi
+	#set mux channel
+	set_gpio i
+	#let channel settle for a bit after switching
+	set_e -1000m
+	wait 100m
+	#lsv from -1V to 1V with 25mV steps at scanrate 2V/s
+	meas_loop_lsv p c -1000m 1000m 25m 2
+		pck_start
+		pck_add p
+		pck_add c
+		pck_end
+	endloop
+	#4 LSB are WE, 4 MSB are CE/RE. This means a 1 ch increment = 0x11 (hexadecimal) = 17 (decimal)
+	add_var i 0x11i
+endloop
+on_finished:
+cell_off
+

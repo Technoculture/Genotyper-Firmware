@@ -1,0 +1,70 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "E:/Genotyper-Firmware/services/extractor/include",
+                "E:/Genotyper-Firmware/services/extractor/src",
+                "E:/Genotyper-Firmware/services/extractor/.pio/libdeps/DNA_Ext_Controller/CAN_BUS_Shield",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
+                "E:/Genotyper-Firmware/services/extractor/.pio/libdeps/DNA_Ext_Controller/Servo/src",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/cores/arduino",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/system/libsam",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/system/CMSIS/CMSIS/Include",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/system/CMSIS/Device/ATMEL",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/variants/arduino_due_x",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/HID/src",
+                "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
+                "C:/Users/user/.platformio/packages/tool-unity",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "E:/Genotyper-Firmware/services/extractor/include",
+                    "E:/Genotyper-Firmware/services/extractor/src",
+                    "E:/Genotyper-Firmware/services/extractor/.pio/libdeps/DNA_Ext_Controller/CAN_BUS_Shield",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
+                    "E:/Genotyper-Firmware/services/extractor/.pio/libdeps/DNA_Ext_Controller/Servo/src",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/cores/arduino",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/system/libsam",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/system/CMSIS/CMSIS/Include",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/system/CMSIS/Device/ATMEL",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/variants/arduino_due_x",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/HID/src",
+                    "C:/Users/user/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
+                    "C:/Users/user/.platformio/packages/tool-unity",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=50203",
+                "__SAM3X8E__",
+                "ARDUINO_SAM_DUE",
+                "ARDUINO=10805",
+                "F_CPU=84000000L",
+                "USBCON",
+                "USB_VID=0x2341",
+                "USB_PID=0x003E",
+                "USB_PRODUCT=\"Arduino Due\"",
+                "USB_MANUFACTURER=\"Arduino\"",
+                "ARDUINO_ARCH_SAM",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "C:/Users/user/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin/arm-none-eabi-gcc.exe",
+            "compilerArgs": [
+                "-mcpu=cortex-m3",
+                "-mthumb",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

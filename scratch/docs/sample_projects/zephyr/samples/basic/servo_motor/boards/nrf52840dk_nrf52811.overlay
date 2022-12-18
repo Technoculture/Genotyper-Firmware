@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/ {
+	aliases {
+		pwm-servo = &pwm0;		
+	};
+};
+
+&pwm0 {	
+	status = "okay";
+};

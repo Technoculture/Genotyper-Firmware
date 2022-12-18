@@ -1,0 +1,14 @@
+identifier: som_nrf52811
+name: SOM-NRF52811
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+ram: 24
+flash: 192
+supported:
+  - counter
+  - pwm
+  - i2c

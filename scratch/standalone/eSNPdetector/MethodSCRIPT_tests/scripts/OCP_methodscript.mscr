@@ -1,0 +1,21 @@
+e
+var c
+var p
+set_pgstat_chan 1
+set_pgstat_mode 0
+set_pgstat_chan 0
+set_pgstat_mode 3
+set_max_bandwidth 40
+set_range_minmax da 0 0
+set_range ab 4200m
+set_autoranging ab 4200m 4200m
+set_range ba 2950u
+set_autoranging ba 2950u 2950u
+cell_off
+meas_loop_ocp p 100m 10100m
+pck_start
+pck_add p
+pck_end
+endloop
+on_finished:
+cell_off

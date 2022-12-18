@@ -1,3 +1,0 @@
-menu "Drivers"
-source "./sensor/Kconfig"
-endmenu
