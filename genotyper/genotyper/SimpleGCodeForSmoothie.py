@@ -24,11 +24,22 @@ class EmitsGcode(Protocol):
 
 
 class CommandType(Enum):
+    """
+    tests:
+    >>> CommandType.GO_HOME.value == 1
+    """
+
     GO_HOME = auto()
     GO_XY = auto()
 
 
 class CommandInfo(NamedTuple):
+    """
+    tests:
+    >>> CommandInfo("G28", [], "Go to home position").gcode == "G28"
+    >>> CommandInfo("G1", ["x", "y", "z"], "Go to specified XY position").fields == ["x", "y", "z"]
+    """
+
     gcode: str
     fields: List[str]
     description: Optional[str] = None
@@ -43,9 +54,17 @@ _command_to_info: Dict[CommandType, CommandInfo] = {
 
 
 class Coordinate(NamedTuple):
-    x: Optional[float] = None
-    y: Optional[float] = None
-    z: Optional[float] = None
+    """
+    tests:
+    >>> Coordinate(1, 2, 3).gcode() == "1 2 3"
+    >>> Coordinate(1, 2, None).gcode() == "1 2"
+    >>> Coordinate(1, None, 3).gcode() == "1 3"
+    >>> Coordinate(1, None, None).gcode() == "1"
+    """
+
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
 
     def gcode(self) -> str:
         return " ".join([f"{v}" for _, v in self._asdict().items() if v is not None])
@@ -54,22 +73,38 @@ class Coordinate(NamedTuple):
 _hardcoded_locations: Dict[str, Coordinate] = {
     "tiprack": Coordinate(20, 100, 20),
     "trash": Coordinate(0, 0, 0),
-    "home": Coordinate(100, 100, 0),
+    "home": Coordinate(0, 0, 0),
 }
 
 
 class NamedLocation(StrEnum):  # type: ignore
+    """
+    tests:
+    >>> NamedLocation.TIPRACK == "tiprack"
+    """
+
     TIPRACK = "tiprack"
     TRASH = "trash"
     HOME = "home"
 
 
 def HardcodedLocation(name: str) -> Coordinate:
+    """
+    tests:
+    >>> HardcodedLocation("home") == Coordinate(0, 0, 0)
+    """
     return _hardcoded_locations[name]
 
 
 @dataclass
 class GcodeCommand(EmitsGcode):
+    """
+    tests:
+    >>> GcodeCommand(CommandType.GO_HOME).gcode() == "G28"
+    >>> GcodeCommand(CommandType.GO_HOME, Coordinate(1, 2, 3)).gcode() == "G28"
+    >>> GcodeCommand(CommandType.GO_XY, Coordinate(1, 2, 3)).gcode() == "G1 1 2 3"
+    """
+
     type: CommandType
     arg: Optional[Coordinate] = None
     info: Optional[CommandInfo] = field(init=False)
@@ -94,6 +129,15 @@ class GcodeCommand(EmitsGcode):
 
 @dataclass
 class CommandSequence(EmitsGcode):
+    """
+    tests:
+    >>> CommandSequence([GcodeCommand(CommandType.GO_HOME)]).gcode() == "G28"
+    >>> CommandSequence([GcodeCommand(CommandType.GO_HOME), GcodeCommand(CommandType.GO_HOME)]).gcode() == "G28\nG28"
+    >>> CommandSequence([GcodeCommand(CommandType.GO_HOME), GcodeCommand(CommandType.GO_HOME)]).name == ""
+    >>> CommandSequence([GcodeCommand(CommandType.GO_HOME), GcodeCommand(CommandType.GO_HOME)], name="Pick Tip").name == "Pick Tip"
+    >>> CommandSequence() + CommandSequence([GcodeCommand(CommandType.GO_HOME)]) == CommandSequence([GcodeCommand(CommandType.GO_HOME)])
+    """
+
     seq: list[GcodeCommand] = field(default_factory=list[GcodeCommand])
     name: str = ""
 
@@ -111,6 +155,7 @@ class CommandSequence(EmitsGcode):
         return "\n".join([gc.gcode() for gc in self.seq])
 
 
+go_home = CommandSequence([GcodeCommand(type=CommandType.GO_HOME)], name="Go Home")
 pick_tip = CommandSequence(
     [
         GcodeCommand(
@@ -123,15 +168,20 @@ pick_tip = CommandSequence(
 )
 
 
-go_home = CommandSequence([GcodeCommand(type=CommandType.GO_HOME)], name="Go Home")
-
-
 def run_through_serial_till_complete(gcode: str) -> None:
     ...
 
 
 @dataclass
 class TaskStats:
+    """
+    tests:
+    >>> ts = TaskStats()
+    >>> ts.start()
+    >>> ts.complete()
+    >>> ts.duration > 0
+    """
+
     created_at: float = field(default_factory=time.time, init=False, repr=False)
     started_at: float = field(default=0.0, init=False, repr=False)
     completed_at: float = field(default=0.0, init=False, repr=False)
@@ -155,12 +205,32 @@ class TaskStats:
 
 @dataclass
 class GcodeTask:
+    """
+    tests:
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).priority == 7
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)]), priority=5).priority == 5
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.duration == 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.elapsed == 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.started_at == 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.completed_at == 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.created_at > 0
+
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.start()
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.started_at > 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.complete()
+
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.completed_at > 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.duration > 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.elapsed > 0
+    >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.elapsed > GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.duration
+    """
+
     seq: CommandSequence
     priority: int = field(default=7)
     stats: TaskStats = field(default_factory=TaskStats)
 
     def __lt__(self, other: Self) -> bool:
-        return self.priority < other.priority
+        return bool(self.priority < other.priority)
 
 
 def execute_seq(cmd_seq: CommandSequence, *, verbose: bool = False) -> None:
@@ -174,7 +244,7 @@ def execute_seq(cmd_seq: CommandSequence, *, verbose: bool = False) -> None:
                     msg += f"({gc.info.description})"
                 print(msg)
 
-            time.sleep(1)
+            time.sleep(0.1)
         print("✅ Execution Complete") if verbose else None
     except (KeyboardInterrupt) as e:
         print(f"Execution Failed\n{e}")
@@ -219,7 +289,7 @@ async def CmdStream(taskQueue: PriorityQueue[Tuple[int, GcodeTask]]) -> None:
     for task in gtasklist:
         await taskQueue.put((task.priority, task))
         # await asyncio.sleep(0.5)
-    await taskQueue.join()
+    # await taskQueue.join()
 
 
 async def main() -> None:
@@ -231,10 +301,8 @@ async def main() -> None:
 
 if __name__ == "__main__":
     GcodeTaskQueue: PriorityQueue[Tuple[int, GcodeTask]] = PriorityQueue()
-    verbose: bool = True
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, asyncio.CancelledError):
         print(f"Exited with {GcodeTaskQueue.qsize()} tasks remaining")
-        if verbose:
-            print(GcodeTaskQueue._queue)  # type: ignore
+        print(f"Pending Tasks Queue: {GcodeTaskQueue._queue}")  # type: ignore
