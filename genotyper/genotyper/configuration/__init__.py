@@ -1,5 +1,3 @@
-
-
 # """
 # This module handles configuration management. It keeps track of where the
 # configuration data is found in the robot, and is able to search for data to

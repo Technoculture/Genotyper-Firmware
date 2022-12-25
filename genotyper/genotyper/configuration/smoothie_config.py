@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Dict
 import os
 from json import dump
+
 # TODO: is this seperation needed?
 from genotyper.configuration.error import ConfigFilenameError
 
@@ -37,7 +38,7 @@ def _deserialize_smoothie_config(config_path: str) -> Dict[str, str]:
 
             # strip leading and trailing whitespace from the key and value strings
             name, var = name.strip(), str(var.strip())
-            name = name.replace('.', '_')
+            name = name.replace(".", "_")
             myvars[name] = var
 
         # debug(f"line skipped: {skipped_line_count} out of {line_count}")
@@ -59,8 +60,7 @@ def _check_config_file(config_path: str) -> None:
     _filename: str = os.path.basename(config_path)
 
     if not os.path.exists(config_path):
-        raise FileNotFoundError(
-            "The path must point to a file named config.txt")
+        raise FileNotFoundError("The path must point to a file named config.txt")
 
     if _filename != "config.txt":
         raise ConfigFilenameError()
@@ -74,7 +74,7 @@ def _dump_dict_to_json(dictionary: Dict[str, str], path: str = "config.json") ->
         path (str, optional): path to the `config.txt` file. Defaults to "config.json".
     """
 
-    with open(path, 'w+') as file:
+    with open(path, "w+") as file:
         dump(dictionary, file)
 
 

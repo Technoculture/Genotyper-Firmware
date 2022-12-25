@@ -1,8 +1,10 @@
 from typing import List, Optional
 from pydantic import BaseModel, validator
 from json import load
+
 # TODO: Is this seperation needed?
 from genotyper.configuration.error import InvalidBaudRateError
+
 # from enum import Enum, IntEnum
 
 
@@ -53,18 +55,20 @@ class Serial(BaseModel):
     serial_number: SerialNumber
     baud_rate: int
 
-    @validator('baud_rate')
+    @validator("baud_rate")
     def baud_rate_is_valid(cls, rate: int) -> int:
         _valid_baud_rates = [9600, 115200]
-        _valid_baud_rates_str = ", ".join(
-            [str(rate) for rate in _valid_baud_rates])
+        _valid_baud_rates_str = ", ".join([str(rate) for rate in _valid_baud_rates])
 
         if rate not in _valid_baud_rates:
             raise InvalidBaudRateError(
-                message="value must be a valid serial baud rate: {}".format(_valid_baud_rates_str))
+                message="value must be a valid serial baud rate: {}".format(
+                    _valid_baud_rates_str
+                )
+            )
         return rate
 
-    @validator('serial_number')
+    @validator("serial_number")
     def serial_number_must_be_valid(cls, sl: str) -> str:
 
         return sl

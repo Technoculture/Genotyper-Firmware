@@ -10,6 +10,7 @@ pyyaml = "*"
 dearpygui = "*"
 confz = "*"
 jupyterlab = "*"
+rich = "*"
 
 [dev-packages]
 sphinx = "*"
@@ -19,6 +20,9 @@ autopep8 = "*"
 pre-commit = "*"
 devtools = "*"
 flake8 = "*"
+ruff = "*"
+mypy = "*"
+black = "*"
 
 [requires]
 python_version = "3.11"

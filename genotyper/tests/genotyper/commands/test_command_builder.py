@@ -13,11 +13,7 @@ def test_builder_create_command_with_terminator() -> None:
 
 @pytest.mark.parametrize(
     argnames=["value", "precision", "expected_float"],
-    argvalues=[
-        [1.2342, 3, 1.234],
-        [1.2342, None, 1.2342],
-        [1.2342, 0, 1.0],
-    ],
+    argvalues=[[1.2342, 3, 1.234], [1.2342, None, 1.2342], [1.2342, 0, 1.0],],
 )
 def test_builder_create_command_add_float(
     value: float, precision: Optional[int], expected_float: float

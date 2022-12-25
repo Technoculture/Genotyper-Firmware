@@ -1,4 +1,3 @@
-
 # from gero.commands.types import init
 def test_execute() -> None:
     assert True

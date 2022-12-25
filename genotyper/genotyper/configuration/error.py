@@ -11,6 +11,7 @@ class ConfigFilenameError(Exception):
 class InvalidBaudRateError(Exception):
     message: str
 
+
 # from enum import Enum
 # from dataclasses import dataclass, asdict, fields
 # from typing import Dict, Tuple, TypeVar, Generic, List, cast

@@ -8,9 +8,9 @@ from typing import Any, Dict
 def getConsoleLogger() -> None:
     logging.basicConfig(
         format="%(asctime)s %(levelname)s (%(lineno)s)|> %(message)s",
-        datefmt='%I:%M:%S',
+        datefmt="%I:%M:%S",
         level=logging.DEBUG,
-        handlers=[logging.StreamHandler(sys.stdout)]
+        handlers=[logging.StreamHandler(sys.stdout)],
     )
 
     # return logging
@@ -53,10 +53,7 @@ def host_config(level_value: int) -> Dict[str, Any]:
             },
         },
         "loggers": {
-            "opentrons": {
-                "handlers": ["debug", "api"],
-                "level": level_value,
-            },
+            "opentrons": {"handlers": ["debug", "api"], "level": level_value,},
             # "opentrons.deck_calibration": {
             #     "handlers": ["debug", "api"],
             #     "level": level_value,
