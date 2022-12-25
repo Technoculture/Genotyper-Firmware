@@ -30,14 +30,14 @@ class CommandType(Enum):
     """
 
     GO_HOME = auto()
-    GO_XY = auto()
+    GO_XZ = auto()
 
 
 class CommandInfo(NamedTuple):
     """
     tests:
     >>> CommandInfo("G28", [], "Go to home position").gcode == "G28"
-    >>> CommandInfo("G1", ["x", "y", "z"], "Go to specified XY position").fields == ["x", "y", "z"]
+    >>> CommandInfo("G1", ["x", "z"], "Go to specified XZ position").fields == ["x", "z"]
     """
 
     gcode: str
@@ -47,9 +47,7 @@ class CommandInfo(NamedTuple):
 
 _command_to_info: Dict[CommandType, CommandInfo] = {
     CommandType.GO_HOME: CommandInfo("G28", [], "Go to home position"),
-    CommandType.GO_XY: CommandInfo(
-        "G1", ["x", "y", "z"], "Go to specified XY position"
-    ),
+    CommandType.GO_XZ: CommandInfo("G1", ["x", "z"], "Go to specified XZ position"),
 }
 
 
@@ -57,23 +55,38 @@ class Coordinate(NamedTuple):
     """
     tests:
     >>> Coordinate(1, 2, 3).gcode() == "1 2 3"
-    >>> Coordinate(1, 2, None).gcode() == "1 2"
-    >>> Coordinate(1, None, 3).gcode() == "1 3"
-    >>> Coordinate(1, None, None).gcode() == "1"
+    >>> Coordinate(1, 2, None).gcode() == "1 2 0"
+    >>> Coordinate(1, None, 3).gcode() == "1 0 3"
+    >>> Coordinate(1, None, None).gcode() == "1 0 0"
     """
 
     x: float = 0.0
     y: float = 0.0
     z: float = 0.0
 
+    def __len__(self) -> int:
+        return len(self._fields)
+
     def gcode(self) -> str:
         return " ".join([f"{v}" for _, v in self._asdict().items() if v is not None])
 
 
-_hardcoded_locations: Dict[str, Coordinate] = {
-    "tiprack": Coordinate(20, 100, 20),
-    "trash": Coordinate(0, 0, 0),
-    "home": Coordinate(0, 0, 0),
+class Coordinate2D(Coordinate):
+    """
+    tests:
+    >>> Coordinate2D(1, 2).gcode() == "1 0 2"
+    >>> Coordinate2D(1, 2).y == 0.0
+    >>> Coordinate2D(1, 2).z == 2.0
+    """
+
+    def __new__(cls, x: float, z: float) -> "Coordinate2D":
+        return super().__new__(cls, x, 0.0, z)
+
+
+_hardcoded_locations: Dict[str, Coordinate2D] = {
+    "tiprack": Coordinate2D(20, 100),
+    "trash": Coordinate2D(0, 0),
+    "home": Coordinate2D(0, 0),
 }
 
 
@@ -88,10 +101,10 @@ class NamedLocation(StrEnum):  # type: ignore
     HOME = "home"
 
 
-def HardcodedLocation(name: str) -> Coordinate:
+def HardcodedLocation(name: str) -> Coordinate2D:
     """
     tests:
-    >>> HardcodedLocation("home") == Coordinate(0, 0, 0)
+    >>> HardcodedLocation("home") == Coordinate2D(0, 0)
     """
     return _hardcoded_locations[name]
 
@@ -101,8 +114,8 @@ class GcodeCommand(EmitsGcode):
     """
     tests:
     >>> GcodeCommand(CommandType.GO_HOME).gcode() == "G28"
-    >>> GcodeCommand(CommandType.GO_HOME, Coordinate(1, 2, 3)).gcode() == "G28"
-    >>> GcodeCommand(CommandType.GO_XY, Coordinate(1, 2, 3)).gcode() == "G1 1 2 3"
+    >>> GcodeCommand(CommandType.GO_HOME, Coordinate2D(1, 2)).gcode() == "G28"
+    >>> GcodeCommand(CommandType.GO_XY, Coordinate2D(1, 2)).gcode() == "G1 1 2"
     """
 
     type: CommandType
@@ -113,14 +126,18 @@ class GcodeCommand(EmitsGcode):
         self.info = _command_to_info[self.type]
         arg_count: int = len(_command_to_info[self.type].fields)
 
-        try:
-            if self.arg is not None:
-                assert len(self.arg) == arg_count
-            else:
-                assert arg_count == 0
-        except AssertionError:
+        _arg_count: int = 0
+        match self.arg:
+            case None:
+                _arg_count = 0
+            case Coordinate2D(x, z):
+                _arg_count = 2
+            case Coordinate(x, y, z):
+                _arg_count = 3
+
+        if self.arg != _arg_count:
             raise ValueError(
-                f"Command {self.type} expects {arg_count} arguments, but got {len(self.arg)}"
+                f"Command {self.type}: Expected {arg_count}, got {_arg_count}"
             )
 
     def gcode(self) -> str:
@@ -159,9 +176,9 @@ go_home = CommandSequence([GcodeCommand(type=CommandType.GO_HOME)], name="Go Hom
 pick_tip = CommandSequence(
     [
         GcodeCommand(
-            type=CommandType.GO_XY, arg=HardcodedLocation(NamedLocation.TIPRACK)
+            type=CommandType.GO_XZ, arg=HardcodedLocation(NamedLocation.TIPRACK)
         ),
-        GcodeCommand(type=CommandType.GO_XY, arg=HardcodedLocation(NamedLocation.HOME)),
+        GcodeCommand(type=CommandType.GO_XZ, arg=HardcodedLocation(NamedLocation.HOME)),
         GcodeCommand(type=CommandType.GO_HOME),
     ],
     name="Pick Tip",
@@ -209,6 +226,7 @@ class GcodeTask:
     tests:
     >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).priority == 7
     >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)]), priority=5).priority == 5
+
     >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.duration == 0
     >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.elapsed == 0
     >>> GcodeTask(CommandSequence([GcodeCommand(CommandType.GO_HOME)])).stats.started_at == 0
@@ -259,8 +277,8 @@ def execute_task(task: GcodeTask, *, verbose: bool = False) -> None:
     execute_seq(task.seq, verbose=verbose)
     task.stats.complete()
 
-    print(f" ↳ {task.seq.name}")
-    print(f"   ↳ {task.stats}")
+    print(f"↳{task.seq.name}")
+    print(f" ↳{task.stats}")
 
 
 async def CmdExecute(taskQueue: PriorityQueue[Tuple[int, GcodeTask]]) -> None:
