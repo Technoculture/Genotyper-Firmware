@@ -1,6 +1,15 @@
+# Firmware
 
+## Probable List of Modules
+### Low Level Modules
+- Slider
+- Upwards and Downwards Stack
+- Gantry
+- Tip Alignment
+- Cartridge ID
+- Cartridge Gate
 
-## Generate a new firmware project
-```sh
-cargo generate --git https://github.com/TechnocultureResearch/cortex-m-quickstart
-```
+### Higher Level Modules
+- Orchestrator
+- Resource Manager
+- Centrifuge
