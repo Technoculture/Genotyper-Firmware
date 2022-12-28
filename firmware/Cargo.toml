@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "slider",
+    "slider-common"
+]

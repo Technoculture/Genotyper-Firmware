@@ -1,0 +1,5 @@
+[default.general]
+chip = "STM32F401RETx"
+
+[with_rtt.rtt]
+enabled = true
