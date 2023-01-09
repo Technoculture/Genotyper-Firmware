@@ -381,6 +381,7 @@ dependencies = [
  "embedded-hal 0.2.7",
  "panic-halt",
  "rtt-target",
+ "slider-common",
  "stm32f4xx-hal",
 ]
 

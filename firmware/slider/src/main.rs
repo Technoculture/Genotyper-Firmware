@@ -10,9 +10,10 @@ mod app {
 
     use stm32f4xx_hal::{
         gpio::{self, Edge, Input, Output, PushPull},
-        pac::TIM1,
+        pac::{TIM1, USART1},
         prelude::*,
         timer,
+        serial,
     };
 
     // Resources shared between tasks
@@ -27,6 +28,15 @@ mod app {
         button: gpio::PC13<Input>,
         led: gpio::PA5<Output<PushPull>>,
         delay: timer::DelayMs<TIM1>,
+
+       // en1: gpio::PA8<Output<PushPull>>,
+       // en2: gpio::PA9<Output<PushPull>>,
+       // dir1: gpio::PA10<Output<PushPull>>,
+       // dir2: gpio::PA11<Output<PushPull>>,
+
+        trinamic: serial::Serial<USART1, gpio::PA0>,
+        limit1: gpio::PA12<Input>,
+        limit2: gpio::PA15<Input>,
     }
 
     #[init]

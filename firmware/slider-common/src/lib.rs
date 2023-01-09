@@ -1,20 +1,22 @@
 //! Slider State Machine
 //!
+//! Diagram:
 //! ```none
-//!  Diagram:
-//!   o
-//!   │
-//!  ┌▼──────────┐
-//!  │ IdleAt(0) │
-//!  └▲──────┬───┘
-//!   │      │Goto(x)
-//!   │ ┌────▼────────────┐
-//!   │ │ MoveTo(from,to) │
-//!   │ └──────┬──────────┘
-//!   │Goto(0) │
-//!  ┌┴────────▼──┐
-//!  │ IdleAt(to) │
-//!  └────────────┘
+//!  o       ┌─┐
+//!  │   Stop│ │
+//! ┌▼───────┴─▼┐
+//! │ IdleAt(0) │
+//! └▲──┬───────┘
+//!  │  │Goto(to)
+//!  │ ┌▼────────────────────────┐
+//!  │ │ MoveTo(from,current,to) │
+//!  │ └────────┬───┬────────────┘
+//!  │Goto(0)   │   │Stop
+//! ┌┴──────────▼┐ ┌▼───────────────┐
+//! │ IdleAt(to) │ │ IdleAt(current)│
+//! └─┬─▲────────┘ └────────────────┘
+//!   │ │Stop
+//!   └─┘
 //! ```
 
 #![no_std]
@@ -22,6 +24,7 @@
 #[derive(Debug, PartialEq)]
 pub struct Slider {
     pub state: SliderState,
+    range: (u32, u32),
 }
 
 /// SliderAction is an action that can be performed on the slider
@@ -49,6 +52,7 @@ impl Slider {
     pub fn new() -> Self {
         Slider {
             state: SliderState::IdleAt { position: 0 },
+            range: (0, u32::max_value()),
         }
     }
 
@@ -171,7 +175,8 @@ mod tests {
                     from: 0,
                     current: 0,
                     to: 10
-                }
+                },
+                range: (0, u32::max_value())
             }
         );
 
