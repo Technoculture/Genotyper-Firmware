@@ -22,9 +22,55 @@
 #![no_std]
 
 #[derive(Debug, PartialEq)]
+pub struct Range {
+    pub min: u32,
+    pub max: u32,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct Position(pub u32, pub &'static Range);
+
+impl Position {
+    pub fn new(value: u32, range: &'static Range) -> Option<Self> {
+        if value <= range.max && value >= range.min {
+            return Some(Self(value, range));
+        }
+        None
+    }
+}
+
+impl core::ops::Add for Position {
+    type Output = Option<Self>;
+    fn add(self, value: Self) -> Option<Self> {
+        let new_value = self.0 + value.0;
+        if new_value <= self.1.max && new_value >= self.1.min {
+            return Some(Self(new_value, self.1));
+        }
+        None
+    }
+}
+
+impl core::ops::Sub for Position {
+    type Output = Option<Self>;
+    fn sub(self, value: Self) -> Option<Self> {
+        let new_value = self.0 - value.0;
+        if new_value <= self.1.max && new_value >= self.1.min {
+            return Some(Self(new_value, self.1));
+        }
+        None
+    }
+}
+
+impl PartialOrd for Position {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        self.0.partial_cmp(&other.0)
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub struct Slider {
     pub state: SliderState,
-    range: (u32, u32),
+    range: &'static Range,
 }
 
 /// SliderAction is an action that can be performed on the slider
@@ -33,7 +79,7 @@ pub enum SliderAction {
     /// Stop the slider
     Stop,
     /// Go to position x
-    Goto(u32),
+    Goto(Position),
 }
 
 /// Slider is a state machine that can be in one of two states:
@@ -41,36 +87,42 @@ pub enum SliderAction {
 #[derive(Debug, PartialEq, Clone)]
 pub enum SliderState {
     /// Sldier is idle at position x
-    IdleAt { position: u32 },
+    IdleAt { position: Position },
     /// Slider is moving from postion 'from' to position 'to'
-    MoveTo { from: u32, current: u32, to: u32 },
+    MoveTo {
+        from: Position,
+        current: Position,
+        to: Position,
+    },
 }
 
 impl Slider {
     /// Create a new slider
     /// The slider is initially idle at position 0
-    pub fn new() -> Self {
+    pub fn new(range: &'static Range) -> Self {
         Slider {
-            state: SliderState::IdleAt { position: 0 },
-            range: (0, u32::max_value()),
+            state: SliderState::IdleAt {
+                position: Position(0, range),
+            },
+            range,
         }
     }
 
     /// Get the current position of the slider
     /// If the slider is moving, the position is the starting position
-    pub fn position(&self) -> u32 {
-        match self.state {
-            SliderState::IdleAt { position } => position,
-            SliderState::MoveTo { current, .. } => current,
+    pub fn position(&self) -> Position {
+        match &self.state {
+            SliderState::IdleAt { position } => position.clone(),
+            SliderState::MoveTo { current, .. } => current.clone(),
         }
     }
 
     /// Get the target position of the slider
     /// If the slider is idle, the target position is the current position
-    pub fn destination(&self) -> Option<u32> {
-        match self.state {
+    pub fn destination(&self) -> Option<Position> {
+        match &self.state {
             SliderState::IdleAt { .. } => None,
-            SliderState::MoveTo { to, .. } => Some(to),
+            SliderState::MoveTo { to, .. } => Some(*to),
         }
     }
 
@@ -86,35 +138,38 @@ impl Slider {
                 to: x,
             },
         };
-
         self
+    }
+
+    fn tick_(&mut self, from: Position, current: Position, to: Position) -> SliderState {
+        let pos_delta = Position(1, self.range);
+        if current == to {
+            SliderState::IdleAt { position: to }
+        } else if current < to {
+            let current = (current + pos_delta).unwrap_or_else(|| current.clone());
+            SliderState::MoveTo {
+                from: from,
+                current: current,
+                to: to,
+            }
+        } else {
+            let current = (current - pos_delta).unwrap_or_else(|| current.clone());
+            SliderState::MoveTo {
+                from: from,
+                current: current,
+                to: to,
+            }
+        }
     }
 
     /// Update the slider
     /// This will move the slider one step closer to its destination
     /// If the slider is idle, this function does nothing
     pub fn tick(&mut self) -> &mut Self {
-        self.state = match self.state {
+        self.state = match &self.state {
             SliderState::IdleAt { .. } => self.state.clone(),
-            SliderState::MoveTo { from, current, to } => {
-                if current == to {
-                    SliderState::IdleAt { position: to }
-                } else if current < to {
-                    SliderState::MoveTo {
-                        from,
-                        current: current + 1,
-                        to,
-                    }
-                } else {
-                    SliderState::MoveTo {
-                        from,
-                        current: current - 1,
-                        to,
-                    }
-                }
-            }
+            SliderState::MoveTo { from, current, to } => self.tick_(*from, *current, *to),
         };
-
         self
     }
 }
@@ -128,128 +183,171 @@ mod tests {
     /// Test if the slider when stopped multiple time, it stops just once
     #[test]
     fn test_slider_stop() {
-        let mut slider = Slider::new();
-        slider.act(SliderAction::Goto(10));
+        const RANGE: Range = Range { min: 0, max: 100 };
+        let mut slider = Slider::new(&RANGE);
+        slider.act(SliderAction::Goto(Position(50, &RANGE)));
 
         for _ in 0..10 {
             slider.tick();
         }
 
         slider.act(SliderAction::Stop);
-        assert_eq!(slider.state, SliderState::IdleAt { position: 10 });
+        assert_eq!(
+            slider.state,
+            SliderState::IdleAt {
+                position: Position(10, &RANGE)
+            }
+        );
         slider.act(SliderAction::Stop);
-        assert_eq!(slider.state, SliderState::IdleAt { position: 10 });
+        assert_eq!(
+            slider.state,
+            SliderState::IdleAt {
+                position: Position(10, &RANGE)
+            }
+        );
     }
 
     /// Test that the slider state machine works
     #[test]
     fn test_slider() {
-        let mut slider = Slider::new();
+        const RANGE: Range = Range { min: 0, max: 100 };
+        let mut slider = Slider::new(&RANGE);
 
-        assert_eq!(slider.position(), 0);
+        assert_eq!(slider.position(), Position(0, &RANGE));
         assert_eq!(slider.destination(), None);
 
-        slider.act(SliderAction::Goto(10));
+        slider.act(SliderAction::Goto(Position(50, &RANGE)));
 
         slider.tick().tick().tick();
 
-        assert_eq!(slider.position(), 3);
-        assert_eq!(slider.destination(), Some(10));
+        assert_eq!(slider.position(), Position(3, &RANGE));
+        assert_eq!(slider.destination(), Some(Position(50, &RANGE)));
 
         slider.act(SliderAction::Stop);
-        assert_eq!(slider.position(), 3);
+        assert_eq!(slider.position(), Position(3, &RANGE));
         assert_eq!(slider.destination(), None);
     }
 
     #[test]
     fn states_and_actions_work() {
-        assert_eq!(Slider::new().state, SliderState::IdleAt { position: 0 });
+        const RANGE: Range = Range { min: 0, max: 100 };
         assert_eq!(
-            Slider::new().act(SliderAction::Stop).state,
-            SliderState::IdleAt { position: 0 }
+            Slider::new(&RANGE).state,
+            SliderState::IdleAt {
+                position: Position(0, &RANGE)
+            }
         );
         assert_eq!(
-            Slider::new().act(SliderAction::Goto(10)),
+            Slider::new(&RANGE).act(SliderAction::Stop).state,
+            SliderState::IdleAt {
+                position: Position(0, &RANGE)
+            }
+        );
+        assert_eq!(
+            Slider::new(&RANGE).act(SliderAction::Goto(Position(50, &RANGE))),
             &Slider {
                 state: SliderState::MoveTo {
-                    from: 0,
-                    current: 0,
-                    to: 10
+                    from: Position(0, &RANGE),
+                    current: Position(0, &RANGE),
+                    to: Position(50, &RANGE),
                 },
-                range: (0, u32::max_value())
+                range: &RANGE,
             }
         );
 
-        let mut slider = Slider::new();
+        let mut slider = Slider::new(&RANGE);
         slider
-            .act(SliderAction::Goto(100))
-            .act(SliderAction::Goto(20));
+            .act(SliderAction::Goto(Position(50, &RANGE)))
+            .act(SliderAction::Goto(Position(100, &RANGE)));
 
-        for _ in 0..120 {
+        for _ in 0..150 {
             slider.tick();
         }
         assert_eq!(
             slider.act(SliderAction::Stop).state,
-            SliderState::IdleAt { position: 20 }
+            SliderState::IdleAt {
+                position: Position(100, &RANGE)
+            }
         );
     }
 
     #[test]
     fn position_works() {
-        assert_eq!(Slider::new().position(), 0);
-        assert_eq!(Slider::new().act(SliderAction::Goto(10)).position(), 0);
-        let mut slider = Slider::new();
+        const RANGE: Range = Range { min: 0, max: 100 };
+        let mut slider = Slider::new(&RANGE);
+
+        assert_eq!(Slider::new(&RANGE).position(), Position(0, &RANGE));
+        assert_eq!(
+            Slider::new(&RANGE)
+                .act(SliderAction::Goto(Position(100, &RANGE)))
+                .position(),
+            Position(0, &RANGE)
+        );
 
         slider
-            .act(SliderAction::Goto(10))
+            .act(SliderAction::Goto(Position(10, &RANGE)))
             .act(SliderAction::Stop)
-            .act(SliderAction::Goto(20));
+            .act(SliderAction::Goto(Position(20, &RANGE)));
         for _ in 0..100 {
             slider.tick();
         }
 
-        assert_eq!(slider.act(SliderAction::Stop).position(), 20);
+        assert_eq!(
+            slider.act(SliderAction::Stop).position(),
+            Position(20, &RANGE)
+        );
     }
 
     #[test]
     fn destination_works() {
-        assert_eq!(Slider::new().destination(), None);
+        const RANGE: Range = Range { min: 0, max: 100 };
+        assert_eq!(Slider::new(&RANGE).destination(), None);
         assert_eq!(
-            Slider::new()
-                .act(SliderAction::Goto(10))
+            Slider::new(&RANGE)
+                .act(SliderAction::Goto(Position(10, &RANGE)))
                 .act(SliderAction::Stop)
                 .destination(),
             None
         );
         assert_eq!(
-            Slider::new()
-                .act(SliderAction::Goto(100))
-                .act(SliderAction::Goto(1000))
+            Slider::new(&RANGE)
+                .act(SliderAction::Goto(Position(10, &RANGE)))
+                .act(SliderAction::Goto(Position(20, &RANGE)))
                 .destination(),
-            Some(1000)
+            Some(Position(20, &RANGE))
         );
     }
 
     #[test]
     fn act_works() {
-        let mut slider = Slider::new();
-        slider
-            .act(SliderAction::Goto(100))
-            .act(SliderAction::Goto(5))
-            .act(SliderAction::Goto(10));
+        const RANGE: Range = Range { min: 0, max: 100 };
+        let mut slider = Slider::new(&RANGE);
 
-        for _ in 0..115 {
+        slider
+            .act(SliderAction::Goto(Position(10, &RANGE)))
+            .act(SliderAction::Goto(Position(20, &RANGE)))
+            .act(SliderAction::Goto(Position(30, &RANGE)));
+
+        for _ in 0..60 {
             slider.tick();
         }
 
         assert_eq!(
             slider.act(SliderAction::Stop).state,
-            SliderState::IdleAt { position: 10 }
+            SliderState::IdleAt {
+                position: Position(30, &RANGE)
+            }
         );
     }
 
     #[test]
     fn new_works() {
-        assert_eq!(Slider::new().state, SliderState::IdleAt { position: 0 });
+        const RANGE: Range = Range { min: 0, max: 100 };
+        assert_eq!(
+            Slider::new(&RANGE).state,
+            SliderState::IdleAt {
+                position: Position(0, &RANGE)
+            }
+        );
     }
 }
