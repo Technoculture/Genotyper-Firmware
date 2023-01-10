@@ -1,7 +1,7 @@
 use slider_common::{Position, Range, Slider, SliderAction};
 
-// /// Loop until the slider reaches the destination.
-// /// Keep calling tick() until the slider has reached the destination.
+/// Loop until the slider reaches the destination.
+/// Keep calling tick() until the slider has reached the destination.
 fn execute_action(slider: &mut Slider) {
     while slider.position() != slider.destination().unwrap() {
         slider.tick();
@@ -19,7 +19,7 @@ fn main() {
     println!(
         "Slider is at {:?}, Slider's destination is set to {:?}",
         slider.position(),
-        slider.destination().unwrap()
+        slider.destination()
     );
 
     let list_of_positions = vec![24, 7, 80, 30, 110, 0, 10];
