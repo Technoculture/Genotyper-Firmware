@@ -206,9 +206,9 @@ impl Slider {
 
         let current_: Position;
         if current < to {
-            current_ = current.clone().add(pos_delta);
+            current_ = current.add(pos_delta);
         } else {
-            current_ = current.clone().sub(pos_delta);
+            current_ = current.sub(pos_delta);
         }
 
         SliderState::MoveTo {
