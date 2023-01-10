@@ -24,6 +24,8 @@
 #![warn(missing_docs)] // Warn if there are missing docs
 use core::fmt::{Debug, Formatter};
 
+mod toggle;
+
 /// Range is a range of values denoting the minimum and maximum values of the slider.
 #[derive(Debug, PartialEq)]
 pub struct Range {
