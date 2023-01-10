@@ -20,6 +20,7 @@
 //! ```
 
 #![no_std]
+use core::fmt::{Debug, Formatter};
 
 #[derive(Debug, PartialEq)]
 pub struct Range {
@@ -27,49 +28,60 @@ pub struct Range {
     pub max: u32,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Position(pub u32, pub &'static Range);
+/// Position is a value between min and max.
+/// It is used to represent the positions of the slider.
+#[derive(PartialEq, Clone)]
+pub struct Position {
+    value: u32,
+    range: &'static Range,
+}
 
 impl Position {
-    pub fn new(value: u32, range: &'static Range) -> Option<Self> {
-        if value <= range.max && value >= range.min {
-            return Some(Self(value, range));
+    /// Create a new position
+    /// If the value is outside the range, the position is set to the closest
+    /// value in the range
+    pub fn new(value: u32, range: &'static Range) -> Self {
+        if value > range.max {
+            return Self {
+                value: range.max,
+                range,
+            };
+        } else if value < range.min {
+            return Self {
+                value: range.min,
+                range,
+            };
         }
-        None
+        Self { value, range }
+    }
+
+    /// When comparing two positions, only the value is compared. The range is ignored.
+    fn add(self, value: u32) -> Self {
+        Self::new(self.value + value, self.range)
+    }
+
+    /// When comparing two positions, only the value is compared. The range is ignored.
+    fn sub(self, value: u32) -> Self {
+        Self::new(self.value - value, self.range)
     }
 }
 
-impl core::ops::Add for Position {
-    type Output = Option<Self>;
-    fn add(self, value: Self) -> Option<Self> {
-        let new_value = self.0 + value.0;
-        if new_value <= self.1.max && new_value >= self.1.min {
-            return Some(Self(new_value, self.1));
-        }
-        None
+impl Debug for Position {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.value)
     }
 }
 
-impl core::ops::Sub for Position {
-    type Output = Option<Self>;
-    fn sub(self, value: Self) -> Option<Self> {
-        let new_value = self.0 - value.0;
-        if new_value <= self.1.max && new_value >= self.1.min {
-            return Some(Self(new_value, self.1));
-        }
-        None
-    }
-}
-
+/// When comparing two positions, only the value is compared. The range is ignored.
 impl PartialOrd for Position {
     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
-        self.0.partial_cmp(&other.0)
+        self.value.partial_cmp(&other.value)
     }
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Slider {
-    pub state: SliderState,
+    state: SliderState,
     range: &'static Range,
 }
 
@@ -102,7 +114,7 @@ impl Slider {
     pub fn new(range: &'static Range) -> Self {
         Slider {
             state: SliderState::IdleAt {
-                position: Position(0, range),
+                position: Position::new(0, range),
             },
             range,
         }
@@ -122,7 +134,7 @@ impl Slider {
     pub fn destination(&self) -> Option<Position> {
         match &self.state {
             SliderState::IdleAt { .. } => None,
-            SliderState::MoveTo { to, .. } => Some(*to),
+            SliderState::MoveTo { to, .. } => Some(to.clone()),
         }
     }
 
@@ -142,23 +154,22 @@ impl Slider {
     }
 
     fn tick_(&mut self, from: Position, current: Position, to: Position) -> SliderState {
-        let pos_delta = Position(1, self.range);
+        let pos_delta: u32 = 1;
         if current == to {
-            SliderState::IdleAt { position: to }
-        } else if current < to {
-            let current = (current + pos_delta).unwrap_or_else(|| current.clone());
-            SliderState::MoveTo {
-                from: from,
-                current: current,
-                to: to,
-            }
+            return SliderState::IdleAt { position: to };
+        }
+
+        let current_: Position;
+        if current < to {
+            current_ = current.clone().add(pos_delta);
         } else {
-            let current = (current - pos_delta).unwrap_or_else(|| current.clone());
-            SliderState::MoveTo {
-                from: from,
-                current: current,
-                to: to,
-            }
+            current_ = current.clone().sub(pos_delta);
+        }
+
+        SliderState::MoveTo {
+            from: from,
+            current: current_,
+            to: to,
         }
     }
 
@@ -168,7 +179,9 @@ impl Slider {
     pub fn tick(&mut self) -> &mut Self {
         self.state = match &self.state {
             SliderState::IdleAt { .. } => self.state.clone(),
-            SliderState::MoveTo { from, current, to } => self.tick_(*from, *current, *to),
+            SliderState::MoveTo { from, current, to } => {
+                self.tick_(from.clone(), current.clone(), to.clone())
+            }
         };
         self
     }
@@ -180,12 +193,46 @@ impl Slider {
 mod tests {
     use super::*;
 
+    #[test]
+    fn position_new_range_clamp() {
+        static RANGE: Range = Range { min: 5, max: 10 };
+        let pos = Position::new(0, &RANGE);
+        assert_eq!(
+            pos,
+            Position {
+                value: 5,
+                range: &RANGE
+            }
+        );
+
+        let pos = Position::new(15, &RANGE);
+        assert_eq!(
+            pos,
+            Position {
+                value: 10,
+                range: &RANGE
+            }
+        );
+
+        let pos = Position::new(100, &RANGE);
+        assert_eq!(
+            pos,
+            Position {
+                value: 10,
+                range: &RANGE
+            }
+        );
+    }
+
     /// Test if the slider when stopped multiple time, it stops just once
     #[test]
     fn test_slider_stop() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         let mut slider = Slider::new(&RANGE);
-        slider.act(SliderAction::Goto(Position(50, &RANGE)));
+        slider.act(SliderAction::Goto(Position {
+            value: 50,
+            range: &RANGE,
+        }));
 
         for _ in 0..10 {
             slider.tick();
@@ -195,14 +242,20 @@ mod tests {
         assert_eq!(
             slider.state,
             SliderState::IdleAt {
-                position: Position(10, &RANGE)
+                position: Position {
+                    value: 10,
+                    range: &RANGE
+                }
             }
         );
         slider.act(SliderAction::Stop);
         assert_eq!(
             slider.state,
             SliderState::IdleAt {
-                position: Position(10, &RANGE)
+                position: Position {
+                    value: 10,
+                    range: &RANGE
+                }
             }
         );
     }
@@ -210,46 +263,88 @@ mod tests {
     /// Test that the slider state machine works
     #[test]
     fn test_slider() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         let mut slider = Slider::new(&RANGE);
 
-        assert_eq!(slider.position(), Position(0, &RANGE));
+        assert_eq!(
+            slider.position(),
+            Position {
+                value: 0,
+                range: &RANGE
+            }
+        );
         assert_eq!(slider.destination(), None);
 
-        slider.act(SliderAction::Goto(Position(50, &RANGE)));
+        slider.act(SliderAction::Goto(Position::new(50, &RANGE)));
 
         slider.tick().tick().tick();
 
-        assert_eq!(slider.position(), Position(3, &RANGE));
-        assert_eq!(slider.destination(), Some(Position(50, &RANGE)));
+        assert_eq!(
+            slider.position(),
+            Position {
+                value: 3,
+                range: &RANGE
+            }
+        );
+        assert_eq!(
+            slider.destination(),
+            Some(Position {
+                value: 50,
+                range: &RANGE
+            })
+        );
 
         slider.act(SliderAction::Stop);
-        assert_eq!(slider.position(), Position(3, &RANGE));
+        assert_eq!(
+            slider.position(),
+            Position {
+                value: 3,
+                range: &RANGE
+            }
+        );
         assert_eq!(slider.destination(), None);
     }
 
     #[test]
     fn states_and_actions_work() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         assert_eq!(
             Slider::new(&RANGE).state,
             SliderState::IdleAt {
-                position: Position(0, &RANGE)
+                position: Position {
+                    value: 0,
+                    range: &RANGE
+                }
             }
         );
         assert_eq!(
             Slider::new(&RANGE).act(SliderAction::Stop).state,
             SliderState::IdleAt {
-                position: Position(0, &RANGE)
+                position: Position {
+                    value: 0,
+                    range: &RANGE
+                }
             }
         );
         assert_eq!(
-            Slider::new(&RANGE).act(SliderAction::Goto(Position(50, &RANGE))),
+            Slider::new(&RANGE).act(SliderAction::Goto(Position {
+                value: 50,
+                range: &RANGE
+            })),
             &Slider {
                 state: SliderState::MoveTo {
-                    from: Position(0, &RANGE),
-                    current: Position(0, &RANGE),
-                    to: Position(50, &RANGE),
+                    from: Position {
+                        value: 0,
+                        range: &RANGE
+                    },
+                    current: Position {
+                        value: 0,
+                        range: &RANGE
+                    },
+                    to: Position {
+                        value: 50,
+                        range: &RANGE
+                    },
                 },
                 range: &RANGE,
             }
@@ -257,8 +352,14 @@ mod tests {
 
         let mut slider = Slider::new(&RANGE);
         slider
-            .act(SliderAction::Goto(Position(50, &RANGE)))
-            .act(SliderAction::Goto(Position(100, &RANGE)));
+            .act(SliderAction::Goto(Position {
+                value: 50,
+                range: &RANGE,
+            }))
+            .act(SliderAction::Goto(Position {
+                value: 100,
+                range: &RANGE,
+            }));
 
         for _ in 0..150 {
             slider.tick();
@@ -266,67 +367,85 @@ mod tests {
         assert_eq!(
             slider.act(SliderAction::Stop).state,
             SliderState::IdleAt {
-                position: Position(100, &RANGE)
+                position: Position {
+                    value: 100,
+                    range: &RANGE
+                }
             }
         );
     }
 
     #[test]
     fn position_works() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         let mut slider = Slider::new(&RANGE);
 
-        assert_eq!(Slider::new(&RANGE).position(), Position(0, &RANGE));
+        assert_eq!(
+            Slider::new(&RANGE).position(),
+            Position {
+                value: 0,
+                range: &RANGE
+            }
+        );
         assert_eq!(
             Slider::new(&RANGE)
-                .act(SliderAction::Goto(Position(100, &RANGE)))
+                .act(SliderAction::Goto(Position::new(100, &RANGE)))
                 .position(),
-            Position(0, &RANGE)
+            Position {
+                value: 0,
+                range: &RANGE
+            }
         );
 
         slider
-            .act(SliderAction::Goto(Position(10, &RANGE)))
+            .act(SliderAction::Goto(Position::new(10, &RANGE)))
             .act(SliderAction::Stop)
-            .act(SliderAction::Goto(Position(20, &RANGE)));
+            .act(SliderAction::Goto(Position::new(20, &RANGE)));
         for _ in 0..100 {
             slider.tick();
         }
 
         assert_eq!(
             slider.act(SliderAction::Stop).position(),
-            Position(20, &RANGE)
+            Position {
+                value: 20,
+                range: &RANGE
+            }
         );
     }
 
     #[test]
     fn destination_works() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         assert_eq!(Slider::new(&RANGE).destination(), None);
         assert_eq!(
             Slider::new(&RANGE)
-                .act(SliderAction::Goto(Position(10, &RANGE)))
+                .act(SliderAction::Goto(Position::new(10, &RANGE)))
                 .act(SliderAction::Stop)
                 .destination(),
             None
         );
         assert_eq!(
             Slider::new(&RANGE)
-                .act(SliderAction::Goto(Position(10, &RANGE)))
-                .act(SliderAction::Goto(Position(20, &RANGE)))
+                .act(SliderAction::Goto(Position::new(10, &RANGE)))
+                .act(SliderAction::Goto(Position::new(20, &RANGE)))
                 .destination(),
-            Some(Position(20, &RANGE))
+            Some(Position {
+                value: 20,
+                range: &RANGE
+            })
         );
     }
 
     #[test]
     fn act_works() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         let mut slider = Slider::new(&RANGE);
 
         slider
-            .act(SliderAction::Goto(Position(10, &RANGE)))
-            .act(SliderAction::Goto(Position(20, &RANGE)))
-            .act(SliderAction::Goto(Position(30, &RANGE)));
+            .act(SliderAction::Goto(Position::new(10, &RANGE)))
+            .act(SliderAction::Goto(Position::new(20, &RANGE)))
+            .act(SliderAction::Goto(Position::new(30, &RANGE)));
 
         for _ in 0..60 {
             slider.tick();
@@ -335,18 +454,24 @@ mod tests {
         assert_eq!(
             slider.act(SliderAction::Stop).state,
             SliderState::IdleAt {
-                position: Position(30, &RANGE)
+                position: Position {
+                    value: 30,
+                    range: &RANGE
+                }
             }
         );
     }
 
     #[test]
     fn new_works() {
-        const RANGE: Range = Range { min: 0, max: 100 };
+        static RANGE: Range = Range { min: 0, max: 100 };
         assert_eq!(
             Slider::new(&RANGE).state,
             SliderState::IdleAt {
-                position: Position(0, &RANGE)
+                position: Position {
+                    value: 0,
+                    range: &RANGE
+                }
             }
         );
     }
