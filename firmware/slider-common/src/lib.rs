@@ -3,27 +3,33 @@
 //! Diagram:
 //! ```none
 //!  o       
-//!  │       ┌─┐Stop
-//! ┌▼───────┴─▼┐
-//! │ IdleAt(0) │
-//! └▲──┬───────┘              
-//!  │  │Goto(to)      Goto(to)┌──┐
-//!  │ ┌▼──────────────────────▼─┐│
-//!  │ │ MoveTo(from,current,to) ├┘
-//!  │ └────────┬───┬────────────┘
-//!  │Goto(0)   │   │Stop
-//! ┌┴──────────▼┐ ┌▼───────────────┐
-//! │ IdleAt(to) │ │ IdleAt(current)│
-//! └─┬─▲────────┘ └────────────────┘
+//!  │      ┌┐Stop
+//! ┌▼──────┴▼┐
+//! │IdleAt(0)│
+//! └▲──┬─────┘              
+//!  │  │Goto(to)            ┌──┐
+//!  │ ┌▼────────────────────▼─┐│Goto(to)
+//!  │ │MoveTo(from,current,to)├┘
+//!  │ └──────┬───┬────────────┘
+//!  │Goto(0) │   │Stop
+//! ┌┴────────▼┐ ┌▼──────────────┐
+//! │IdleAt(to)│ │IdleAt(current)│
+//! └─┬─▲──────┘ └───────────────┘
 //!   └─┘Stop
 //! ```
+//!
+//! Code Walkthrough: https://www.loom.com/share/3c9e1b622508449ebd2c9b87f7a962bd
 
 #![no_std]
+#![warn(missing_docs)] // Warn if there are missing docs
 use core::fmt::{Debug, Formatter};
 
+/// Range is a range of values denoting the minimum and maximum values of the slider.
 #[derive(Debug, PartialEq)]
 pub struct Range {
+    /// min is the minimum value of the range
     pub min: u32,
+    /// max is the maximum value of the range
     pub max: u32,
 }
 
@@ -78,10 +84,19 @@ impl PartialOrd for Position {
     }
 }
 
+/// Slider is a state machine that can be in one of two states:
+/// IdleAt(position) or MoveTo(from, current, to)
+/// The slider can be moved to a new position by calling act()
+/// The slider can be ticked by calling tick()
+/// The slider can be queried for its current position by calling position()
+/// The slider can be queried for its destination by calling destination()
 #[derive(Debug, PartialEq)]
 pub struct Slider {
+    /// state is the current state of the slider
     state: SliderState,
+    /// range is the range of the slider
     range: &'static Range,
+    /// tick_handler is a function that is called when the slider is ticked.
     tick_handler: fn(SliderState) -> SliderState,
 }
 
@@ -99,11 +114,17 @@ pub enum SliderAction {
 #[derive(Debug, PartialEq, Clone)]
 pub enum SliderState {
     /// Sldier is idle at position x
-    IdleAt { position: Position },
+    IdleAt {
+        /// position is the position the slider is idle at
+        position: Position,
+    },
     /// Slider is moving from postion 'from' to position 'to'
     MoveTo {
+        /// from is the position the slider started moving from
         from: Position,
+        /// current is the current position of the slider
         current: Position,
+        /// to is the position the slider is moving to
         to: Position,
     },
 }
