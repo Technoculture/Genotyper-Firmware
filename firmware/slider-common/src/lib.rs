@@ -2,21 +2,20 @@
 //!
 //! Diagram:
 //! ```none
-//!  o       ┌─┐
-//!  │   Stop│ │
+//!  o       
+//!  │       ┌─┐Stop
 //! ┌▼───────┴─▼┐
 //! │ IdleAt(0) │
-//! └▲──┬───────┘
-//!  │  │Goto(to)
-//!  │ ┌▼────────────────────────┐
-//!  │ │ MoveTo(from,current,to) │
+//! └▲──┬───────┘              
+//!  │  │Goto(to)      Goto(to)┌──┐
+//!  │ ┌▼──────────────────────▼─┐│
+//!  │ │ MoveTo(from,current,to) ├┘
 //!  │ └────────┬───┬────────────┘
 //!  │Goto(0)   │   │Stop
 //! ┌┴──────────▼┐ ┌▼───────────────┐
 //! │ IdleAt(to) │ │ IdleAt(current)│
 //! └─┬─▲────────┘ └────────────────┘
-//!   │ │Stop
-//!   └─┘
+//!   └─┘Stop
 //! ```
 
 #![no_std]
@@ -83,6 +82,7 @@ impl PartialOrd for Position {
 pub struct Slider {
     state: SliderState,
     range: &'static Range,
+    tick_handler: fn(SliderState) -> SliderState,
 }
 
 /// SliderAction is an action that can be performed on the slider
@@ -118,6 +118,7 @@ impl Slider {
                 position: Position::new(0, range),
             },
             range,
+            tick_handler: Self::default_tick_handler,
         }
     }
 
@@ -154,10 +155,29 @@ impl Slider {
         self
     }
 
+    /// Set the tick handler
+    /// The tick handler is a function that is called every time the slider is ticked
+    /// The tick handler is responsible for moving the slider one step closer to its destination
+    /// The default tick handler is used if no tick handler is set
+    /// The tick handler is passed the current state of the slider
+    /// The tick handler is expected to return the new state of the slider
+    pub fn set_tick_handler(&mut self, tick_handler: fn(SliderState) -> SliderState) -> &mut Self {
+        self.tick_handler = tick_handler;
+        self
+    }
+
     /// Update the slider
     /// This will move the slider one step closer to its destination
     /// If the slider is idle, this function does nothing
-    fn tick_(&mut self, from: Position, current: Position, to: Position) -> SliderState {
+    pub fn tick(&mut self) -> &mut Self {
+        self.state = (self.tick_handler)(self.state.clone());
+        self
+    }
+
+    /// Handle a tick of the slider
+    /// This will move the slider one step closer to its destination
+    /// If the slider is idle, this function does nothing
+    fn tick_(from: Position, current: Position, to: Position) -> SliderState {
         let pos_delta: u32 = 1;
         if current == to {
             return SliderState::IdleAt { position: to };
@@ -171,23 +191,19 @@ impl Slider {
         }
 
         SliderState::MoveTo {
-            from: from,
+            from,
             current: current_,
-            to: to,
+            to,
         }
     }
 
-    /// Update the slider
-    /// This will move the slider one step closer to its destination
-    /// If the slider is idle, this function does nothing
-    pub fn tick(&mut self) -> &mut Self {
-        self.state = match &self.state {
-            SliderState::IdleAt { .. } => self.state.clone(),
+    fn default_tick_handler(state: SliderState) -> SliderState {
+        match state {
+            SliderState::IdleAt { .. } => state,
             SliderState::MoveTo { from, current, to } => {
-                self.tick_(from.clone(), current.clone(), to.clone())
+                Self::tick_(from.clone(), current.clone(), to.clone())
             }
-        };
-        self
+        }
     }
 }
 
@@ -351,6 +367,7 @@ mod tests {
                     },
                 },
                 range: &RANGE,
+                tick_handler: Slider::default_tick_handler,
             }
         );
 
