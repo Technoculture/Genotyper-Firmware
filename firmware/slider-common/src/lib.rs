@@ -55,12 +55,12 @@ impl Position {
         Self { value, range }
     }
 
-    /// When comparing two positions, only the value is compared. The range is ignored.
+    /// When adding to a Position, the value is added to the position's value.
     fn add(self, value: u32) -> Self {
         Self::new(self.value + value, self.range)
     }
 
-    /// When comparing two positions, only the value is compared. The range is ignored.
+    /// When subtracting from a Position, the value is subtracted from the position's value.
     fn sub(self, value: u32) -> Self {
         Self::new(self.value - value, self.range)
     }
@@ -95,7 +95,7 @@ pub enum SliderAction {
 }
 
 /// Slider is a state machine that can be in one of two states:
-/// IdleAt(x) or MoveTo(x, y)
+/// IdleAt(position) or MoveTo(from, current, to)
 #[derive(Debug, PartialEq, Clone)]
 pub enum SliderState {
     /// Sldier is idle at position x
@@ -111,6 +111,7 @@ pub enum SliderState {
 impl Slider {
     /// Create a new slider
     /// The slider is initially idle at position 0
+    /// Note: "Position 0" simply maps to the minimum value of its range
     pub fn new(range: &'static Range) -> Self {
         Slider {
             state: SliderState::IdleAt {
@@ -121,7 +122,7 @@ impl Slider {
     }
 
     /// Get the current position of the slider
-    /// If the slider is moving, the position is the starting position
+    /// If the slider is idle, the current position is the target position
     pub fn position(&self) -> Position {
         match &self.state {
             SliderState::IdleAt { position } => position.clone(),
@@ -153,6 +154,9 @@ impl Slider {
         self
     }
 
+    /// Update the slider
+    /// This will move the slider one step closer to its destination
+    /// If the slider is idle, this function does nothing
     fn tick_(&mut self, from: Position, current: Position, to: Position) -> SliderState {
         let pos_delta: u32 = 1;
         if current == to {
