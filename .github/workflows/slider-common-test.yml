@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - 'firmware/slider-common/**'
+  pull_request:
+    paths:
+      - 'firmware/slider-common/**'
   workflow_dispatch:
 
 env:
