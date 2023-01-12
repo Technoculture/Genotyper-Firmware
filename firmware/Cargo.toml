@@ -2,5 +2,6 @@
 
 members = [
     "slider",
-    "slider-common"
+    "slider-common",
+    "gcode-queue"
 ]

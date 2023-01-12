@@ -12,8 +12,8 @@ mod app {
         gpio::{self, Edge, Input, Output, PushPull},
         pac::{TIM1, USART1},
         prelude::*,
+        //serial, 
         timer,
-        serial,
     };
 
     // Resources shared between tasks
@@ -29,14 +29,13 @@ mod app {
         led: gpio::PA5<Output<PushPull>>,
         delay: timer::DelayMs<TIM1>,
 
-       // en1: gpio::PA8<Output<PushPull>>,
-       // en2: gpio::PA9<Output<PushPull>>,
-       // dir1: gpio::PA10<Output<PushPull>>,
-       // dir2: gpio::PA11<Output<PushPull>>,
-
-        trinamic: serial::Serial<USART1, gpio::PA0>,
-        limit1: gpio::PA12<Input>,
-        limit2: gpio::PA15<Input>,
+        // en1: gpio::PA8<Output<PushPull>>,
+        // en2: gpio::PA9<Output<PushPull>>,
+        // dir1: gpio::PA10<Output<PushPull>>,
+        // dir2: gpio::PA11<Output<PushPull>>,
+        //trinamic: serial::Serial<USART1, gpio::PA0>,
+        //limit1: gpio::PA12<Input>,
+        //limit2: gpio::PA15<Input>,
     }
 
     #[init]
@@ -45,7 +44,7 @@ mod app {
 
         // Configure and obtain handle for delay abstraction
         // 1) Promote RCC structure to HAL to be able to configure clocks
-        let rcc = dp.RCC.constrain();
+        let rcc = dp.RCC.staticrain();
         // 2) Configure the system clocks
         // 8 MHz must be used for HSE on the Nucleo-F401RE board according to manual
         let clocks = rcc.cfgr.use_hse(8.MHz()).freeze();
@@ -68,7 +67,7 @@ mod app {
 
         // Configure Button Pin for Interrupts
         // 1) Promote SYSCFG structure to HAL to be able to configure interrupts
-        let mut syscfg = dp.SYSCFG.constrain();
+        let mut syscfg = dp.SYSCFG.staticrain();
         // 2) Make button an interrupt source
         button.make_interrupt_source(&mut syscfg);
         // 3) Make button an interrupt source
