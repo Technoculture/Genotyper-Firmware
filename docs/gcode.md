@@ -1,6 +1,6 @@
 # G-Code for Orchestrator Individual Operation
 
-![orchestrator code parameter](./assets/orchestrator_parametrs.png)
+![orchestrator code parameter](./assets/orchestrator_parameters.png)
 
 ## Some of G-code used in current Orchestrator Prototype unit :
 
