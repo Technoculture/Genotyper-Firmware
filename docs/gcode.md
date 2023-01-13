@@ -25,13 +25,13 @@ G01 Y200 F1000         # Y axis move to position 200 at speed 1000mm per munite
 G01 Y100               # Y axis move to position 100 at speed previous line specified per munite
 G01 X50                # X axis move to position 100 at speed last specified line per munite
 G01 X120 Y200 F2500    # Y axis and X axis both move to position 120 for x and 200 for y at speed 2500mm per munite
-G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary                            home position)
+G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary home position)
 G01 X120 Y200 F2000    # Y axis and X axis both move to position 120 for x and 200 for y at speed 2000mm per munite
-G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary                            home position)
+G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary home position)
 G01 X120 Y200 F2500    # Y axis and X axis both move to position 120 for x and 200 for y at speed 2500mm per munite
-G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary                            home position)
+G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary home position)
 G01 X120 Y200 F1500    # Y axis and X axis both move to position 120 for x and 200 for y at speed 1500mm per munite
-G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary                            home position)
+G01 X150 Y210 F500     # Y axis and X axis both move to position 150 for x and 210 for y at speed 500mm per munite (secondary home position)
 M84                    # Motors are off
 
 ```
