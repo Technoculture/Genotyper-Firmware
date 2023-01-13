@@ -14,7 +14,7 @@ G03  # Controlled arc movements counter clockwise using X and Y axis
 F500 # Feed rate mm per munite, here 500mm per munite
 ```
 
-> **Kindly visit that link -** https://reprap.org/wiki/G-code  **for more information on RepRap 3d printer G-codes and M-codes, as well as compatible with smoothie board.**
+> **Kindly visit that link -** https://reprap.org/wiki/G-code and https://howtomechatronics.com/tutorials/g-code-explained-list-of-most-important-g-code-commands/  **for more information on RepRap 3d printer G-codes and M-codes, as well as compatible with smoothie board.**
 
 > **Here is an example of two axis (X,Y) system works using smoothie board** 
 
