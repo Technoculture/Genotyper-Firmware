@@ -5,13 +5,14 @@
 ## Some of G-code used in current Orchestrator Prototype unit :
 
 ```G-code
-G28  # go to home position
-M84  # motor stop
-G01  # linier interpolation
-G00  # rapid interpolation
-G02  # Controlled arc movements clockwise using X and Y axis
-G03  # Controlled arc movements counter clockwise using X and Y axis
-F500 # Feed rate mm per munite, here 500mm per munite
+G28        # go to home position
+M84        # motor stop
+G01        # linier interpolation
+G00        # rapid interpolation
+G02        # Controlled arc movements clockwise using X and Y axis
+G03        # Controlled arc movements counter clockwise using X and Y axis
+F500       # Feed rate mm per munite, here 500mm per munite
+G04 P2000  # Pause / Dwell (to hold for some time, say P = 2000ms)
 ```
 
 > **Kindly visit that link -** https://reprap.org/wiki/G-code and https://howtomechatronics.com/tutorials/g-code-explained-list-of-most-important-g-code-commands/  **for more information on RepRap 3d printer G-codes and M-codes, as well as compatible with smoothie board.**
