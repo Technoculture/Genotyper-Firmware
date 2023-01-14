@@ -62,6 +62,11 @@ impl Position {
         Self { value, range }
     }
 
+    /// Get the value of the position
+    pub fn value(&self) -> u32 {
+        self.value
+    }
+
     /// When adding to a Position, the value is added to the position's value.
     fn add(self, value: u32) -> Self {
         Self::new(self.value + value, self.range)

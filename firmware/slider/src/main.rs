@@ -12,7 +12,7 @@ mod app {
         gpio::{self, Edge, Input, Output, PushPull},
         pac::{TIM1, USART1},
         prelude::*,
-        //serial, 
+        //serial,
         timer,
     };
 
@@ -28,7 +28,6 @@ mod app {
         button: gpio::PC13<Input>,
         led: gpio::PA5<Output<PushPull>>,
         delay: timer::DelayMs<TIM1>,
-
         // en1: gpio::PA8<Output<PushPull>>,
         // en2: gpio::PA9<Output<PushPull>>,
         // dir1: gpio::PA10<Output<PushPull>>,
