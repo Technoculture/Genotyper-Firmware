@@ -1,8 +1,11 @@
 use chrono::prelude::*;
 use chrono::Duration;
+use log::debug;
 use slider_common::Position;
 use std::fmt::{Display, Formatter};
-use log::debug;
+
+mod serial;
+pub use serial::*;
 
 /// ToGcode trait for converting a type to a Gcode string
 pub trait ToGcode {
