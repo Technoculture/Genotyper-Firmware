@@ -1,8 +1,9 @@
 # G-Code for Orchestrator Individual Operation
 
 
+![orchestrator code parameter](https://user-images.githubusercontent.com/51780510/212542004-4ec47207-69be-4fd7-9d52-64e6b4b4a104.png)
 
-![orchestrator code parameter](C:\Users\TCR\Desktop\orchestrator code parameter.png)
+
 
 ### Some of G-code used in current Orchestrator Prototype unit :
 
