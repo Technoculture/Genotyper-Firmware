@@ -7,6 +7,9 @@ use std::fmt::{Display, Formatter};
 mod serial;
 pub use serial::*;
 
+// mod queue;
+// pub use queue::*;
+
 /// ToGcode trait for converting a type to a Gcode string
 pub trait ToGcode {
     fn gcode(&self) -> Option<String>;
@@ -45,7 +48,7 @@ impl GcodeInfo for Op {
     /// Returns the GCode for the operation
     /// # Example
     /// ```
-    /// use gcode_queue::{Op, GcodeInfo, ToGcode};
+    /// use gantry_controller::{Op, GcodeInfo, ToGcode};
     /// use slider_common::{Position, Range};
     /// static RANGE: Range = Range { min: 0, max: 100 };
     /// let op = Op::GotoX { x: Position::new(100, &RANGE), mm_per_min: 1000 };
@@ -64,7 +67,7 @@ impl GcodeInfo for Op {
     /// Returns a description of the operation
     /// # Example
     /// ```
-    /// use gcode_queue::{Op, GcodeInfo};
+    /// use gantry_controller::{Op, GcodeInfo};
     /// use slider_common::{Position, Range};
     /// static RANGE: Range = Range { min: 0, max: 100 };
     /// let op = Op::GotoX { x: Position::new(100, &RANGE), mm_per_min: 1000 };
@@ -104,7 +107,7 @@ impl ToGcode for GcodeSequence {
     /// Convert a GcodeSequence to a Gcode string
     /// # Example
     /// ```
-    /// use gcode_queue::{GcodeSequence, Op, ToGcode};
+    /// use gantry_controller::{GcodeSequence, Op, ToGcode};
     /// use slider_common::{Position, Range};
     ///
     /// static RANGE: Range = Range { min: 0, max: 100 };
@@ -178,7 +181,7 @@ impl TaskStats {
     /// Complete the TaskStats
     /// # Example
     /// ```
-    /// use gcode_queue::TaskStats;
+    /// use gantry_controller::TaskStats;
     /// use std::thread::sleep;
     /// use std::time::Duration;
     /// let mut stats = TaskStats::new();
@@ -233,7 +236,7 @@ impl GcodeTask {
     /// Create a new GcodeTask
     /// # Example
     /// ```
-    /// use gcode_queue::{GcodeTask, GcodeSequence, Op, ToGcode};
+    /// use gantry_controller::{GcodeTask, GcodeSequence, Op, ToGcode};
     /// use slider_common::{Position, Range};
     ///
     /// static RANGE: Range = Range { min: 0, max: 100 };

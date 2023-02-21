@@ -7,15 +7,13 @@
       "name": "Debug (OpenOCD)",
       "servertype": "openocd",
       "cwd": "${workspaceRoot}",
-      "executable": "./target/thumbv7em-none-eabihf/debug/slider",
+      "executable": "../target/thumbv7em-none-eabihf/debug/slider",
       "preLaunchTask": "build",
       "device": "STM32F401RET6U",
       "configFiles": [
-        "interface/stlink-v2-1.cfg",
-        "target/stm32f4x.cfg"
+        "openocd.cfg",
       ],
       "svdFile": "${workspaceRoot}/STM32F401.svd",
-      "runToEntryPoint": "main",
     }
   ]
 }

@@ -3,5 +3,5 @@
 members = [
     "slider",
     "slider-common",
-    "gcode-queue"
+    "gantry-controller"
 ]

@@ -1,5 +1,10 @@
 # Firmware
 
+```
+- HMI
+- 
+```
+
 ## Probable List of Modules
 ### Low Level Modules
 - Slider

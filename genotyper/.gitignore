@@ -4,3 +4,4 @@ dist/
 
 # Ignore dynaconf secret files
 .secrets.*
+**/wandb
