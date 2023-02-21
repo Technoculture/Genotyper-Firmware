@@ -1,8 +1,18 @@
 [workspace]
 
 members = [
-    "slider",
     "slider-common",
+
     "gantry-controller",
-    "centrifuge-controller"
+    "centrifuge-controller",
+
+    "reagent-rm",
+    "sample-rm",
+    "tool-rm",
+    "tip-rm",
+    "cartridge-rm"
+]
+
+exclude = [
+    "slider-uc"
 ]
