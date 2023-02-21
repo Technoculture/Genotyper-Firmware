@@ -10,7 +10,9 @@ members = [
     "sample-rm",
     "tool-rm",
     "tip-rm",
-    "cartridge-rm"
+    "cartridge-rm",
+
+    "meet-geno/src-tauri"
 ]
 
 exclude = [
