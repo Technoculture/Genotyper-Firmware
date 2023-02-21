@@ -3,5 +3,6 @@
 members = [
     "slider",
     "slider-common",
-    "gantry-controller"
+    "gantry-controller",
+    "centrifuge-controller"
 ]

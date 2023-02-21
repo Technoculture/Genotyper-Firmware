@@ -40,7 +40,7 @@ pub fn port_match(port: &SerialPortType, target_info: &KnownSerialDevice) -> boo
 /// * `target_info` - The serial number, manufacturer, and product to check against
 fn find_matching_port(target_info: &KnownSerialDevice) -> Option<SerialPortInfo> {
     available_ports()
-        .unwrap()
+        .unwrap_or(vec![])
         .into_iter()
         .filter(|port| port_match(&port.port_type, &target_info))
         .next()
@@ -87,7 +87,7 @@ fn read_from_file_and_parse(path: &str) -> Option<KnownSerialDevice> {
 pub fn find_gantry_port_name() -> SerialPortInfo {
     let path = "gantry.toml";
     let info = read_from_file_and_parse(path).unwrap();
-    find_matching_port(&info).unwrap()
+    find_matching_port(&info).expect("Failed to find gantry port")
 }
 
 pub fn open_gantry_port(port_name: &str) -> Box<dyn SerialPort> {

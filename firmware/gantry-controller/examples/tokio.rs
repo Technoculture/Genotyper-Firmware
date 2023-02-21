@@ -1,5 +1,5 @@
-#![allow(unused_imports)]
-#![allow(dead_code)]
+// #![allow(unused_imports)]
+// #![allow(dead_code)]
 
 use gantry_controller::{find_gantry_port_name, open_gantry_port};
 
