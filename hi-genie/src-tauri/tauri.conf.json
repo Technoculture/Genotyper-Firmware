@@ -60,10 +60,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
-        "resizable": true,
+        "height": 800,
+        "resizable": false,
         "title": "hi-genie",
-        "width": 800
+        "width": 600
       }
     ]
   }
