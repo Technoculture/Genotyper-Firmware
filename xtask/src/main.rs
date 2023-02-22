@@ -1,22 +1,43 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
+
+/// Commands
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Serial Devices
+    Serial {
+        /// List all serial devices
+        #[arg(short, long)]
+        list: bool,
+    },
+}
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-struct Args {
-    /// Name of the person to greet
-    #[arg(short, long)]
-    name: String,
+struct Cli {
+    /// The command to run
+    #[clap(subcommand)]
+    command: Command,
 
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+    /// The verbosity level
+    #[arg(short, long)]
+    verbose: bool,
 }
 
 fn main() {
-    let args = Args::parse();
+    let args = Cli::parse();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name)
+    if args.verbose {
+        println!("Hello {:?}!", args.command);
+    }
+
+    match args.command {
+        Command::Serial { list } => {
+            if list {
+                println!("Listing serial devices");
+            } else {
+                println!("No command given");
+            }
+        }
     }
 }
