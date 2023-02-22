@@ -1,4 +1,4 @@
-use slider_common::{Position, Range, Slider, SliderAction};
+use slider_driver::{Position, Range, Slider, SliderAction};
 
 /// Loop until the slider reaches the destination.
 /// Keep calling tick() until the slider has reached the destination.

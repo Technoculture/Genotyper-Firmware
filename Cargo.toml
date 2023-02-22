@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "slider-common",
+    "slider-driver",
 
     "gantry-controller",
     "centrifuge-controller",
