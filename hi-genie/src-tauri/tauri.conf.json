@@ -63,7 +63,8 @@
         "height": 800,
         "resizable": false,
         "title": "hi-genie",
-        "width": 600
+        "width": 600,
+        "decorations": false
       }
     ]
   }
