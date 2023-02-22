@@ -1,6 +1,8 @@
 [workspace]
 
 members = [
+    "xtask",
+    
     "slider-driver",
 
     "gantry-controller",
