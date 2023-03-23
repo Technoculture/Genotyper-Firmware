@@ -1,22 +1,31 @@
 [workspace]
 
 members = [
+    # Building and Running
     "xtask",
+
+    # Libraries
+    "workflow",
     
+    # Drivers
     "slider-driver",
 
+    # Module controllers
     "gantry-controller",
     "centrifuge-controller",
 
+    # Resource managers
     "reagent-rm",
     "sample-rm",
     "tool-rm",
     "tip-rm",
     "cartridge-rm",
 
+    # UI
     "hi-genie/src-tauri"
 ]
 
 exclude = [
+    # Firmware Executables
     "slider-uc"
 ]
