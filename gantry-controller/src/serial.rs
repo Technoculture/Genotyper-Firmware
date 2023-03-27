@@ -26,7 +26,7 @@ pub fn port_match(port: &SerialPortType, target_info: &KnownSerialDevice) -> boo
     match port {
         SerialPortType::UsbPort(info) => {
             info.serial_number == Some(target_info.serial_number.clone())
-                && info.manufacturer == target_info.manufacturer
+                //&& info.manufacturer == target_info.manufacturer
                 && info.product == target_info.product
         }
         _ => false,
