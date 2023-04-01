@@ -1,12 +1,12 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "92ab9ac25d4a0aa67b43f81e2e13b9464a26489205e60c2f27a441ed90b67f1d"
+            "sha256": "6f996e7d570514a303fff33e58e31311bdb671dda6c9d30591206e13dbbf6ac2"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_full_version": "3.11.1",
-            "python_version": "3.11"
+            "python_full_version": "3.10.10",
+            "python_version": "3.10"
         },
         "sources": [
             {
@@ -321,11 +321,11 @@
         },
         "langchain": {
             "hashes": [
-                "sha256:03a73e5f43a096e1f6f13938f3db91102692960d84bd88fd1a3b00f96d2db265",
-                "sha256:14adc37ab466e6fe60f06fe536f624982cd8aeeae868b98c50e740a4b315a313"
+                "sha256:71a843228526a90a62e07c7234e106028f71528dcf0ff42815fb5af79a6326fc",
+                "sha256:efa4804ecb6e11adcb826c5d73e0697aeba9ac92396a6d1a9866dbe500626cb8"
             ],
             "index": "pypi",
-            "version": "==0.0.123"
+            "version": "==0.0.128"
         },
         "marshmallow": {
             "hashes": [

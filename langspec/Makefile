@@ -1,3 +1,3 @@
 
 all:
-	pipenv run python cli.py
+	python cli.py
