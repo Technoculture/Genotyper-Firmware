@@ -98,11 +98,3 @@ async def llmtree_agent():
     return output
 
 langchain_visualizer.visualize(llmtree_agent)
-
-"""
-Tests and metrics:
- - Effect of temperature on the agent's performance
- - Accuracy compared to human performance
- - Hallucination rate
- - Precondition disregard count
-"""
