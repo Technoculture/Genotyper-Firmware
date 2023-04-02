@@ -1,159 +1,332 @@
+"""
+Objectives:
+    - Given a set of nodes (action, selector and sequence nodes), generate a tree of nodes
+    - Each action, selector and sequence should be modelled as a tool
+    - Each tool should have a pre-condition
+    - Preconditions should be checked before executing the tool
+    - The tree should be traversed in a depth-first manner
+    - Visualize the generated tree
+
+Task:
+    - Given a task in english, generate a correct behavior tree
+"""
+
+import langchain_visualizer
+import asyncio
+from dataclasses import dataclass
+import re
+from pydantic import BaseModel, Field
+
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
 from langchain.agents import tool, Tool
 from langchain.agents import initialize_agent
 
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 from enum import Enum
+from abc import ABC, abstractmethod
 
 from graphviz import Digraph
 
 template = """
-Given the question, answer it. If one of tools appear to be useful, use them IF AND ONLY IF the preconditions are satisfied. Otherwise, use the default answer.
-
-BE EXTRA CAREFUL WHEN USING TOOLS. ALWAYS PRIORITIZE SAFETY OVER CONVENIENCE.
-
-NEVER USE TOOLS FOR WHICH THE PRECONDITIONS ARE NOT SATISFIED.
-
 Question: {q}
 """
 
 
-class NodeType(str, Enum):
+class NodeMode(str, Enum):
     ACTION = "action"
-    SEQUENCE = "sequence"
-    SELECTOR = "selector"
+    CONDITION = "condition"
 
 
-class Node:
-    def __init__(self,
-                 name: str,
-                 description: str,
-                 precondition: str,
-                 func: Callable = lambda: None,
-                 *, is_selector=False):
-        self.children = []
-        self.name = name
-        self.description = description
-        if precondition:
-            self.description += f"""
-            Please make sure that this node is only ever executed in conditions that fulfill the following
-            
-            pre-condition: 
-            {precondition}. 
-            
-            PRECONDITIONS ARE ESSENTIAL FOR THE SAFETY OF THE SYSTEM. ALWAYS PRIORITIZE SAFETY OVER CONVENIENCE.
-            """
-        self.func = func
-        self.is_selector = is_selector
+class Node(BaseModel):
+    name: str
+    mode: NodeMode
+    description: str
+    executor: Callable
+    preconditions: List[str]
 
-    def __repr__(self) -> str:
-        return f"Node('{self.name}', '{self.description}', type={self.node_type}, children={len(self.children)})"
+    @classmethod
+    def from_docstring(cls, fn: Callable):
+        docstring = fn.__doc__
+        lines = docstring.strip().split("\n")
+        fields = {}
 
-    @property
-    def node_type(self) -> NodeType:
-        if len(self.children) == 0:
-            return NodeType.ACTION
-        elif self.is_selector:
-            return NodeType.SELECTOR
-        else:
-            return NodeType.SEQUENCE
+        for line in lines:
+            # colon is the separator
+            match = re.match(r"(.*):(.*)", line.strip())
+            if match:
+                key, value = match.groups()
+                key, value = key.strip(), value.strip()  # remove whitespace
+                fields[key] = value.split(
+                    ",") if key == "preconditions" else value
+        fields["executor"] = fn
+        fields["name"] = fn.__name__
 
-    def append(self, node):
-        self.children.append(node)
-
-    @property
-    def is_leaf(self):
-        return len(self.children) == 0
-
-    def execute(self, whiteboard):
-        if self.node_type == NodeType.ACTION:
-            print("executing {}".format(self))
-        elif self.node_type == NodeType.SELECTOR:
-            print("selecting {}".format(self))
-        elif self.node_type == NodeType.SEQUENCE:
-            print("sequencing {}".format(self))
-
-    def to_tools(self) -> List[Tool]:
-        tools = [Tool(self.name, self.func, self.description)]
-        if not self.is_leaf:
-            for child in self.children:
-                tools += child.to_tools()
-        return tools
+        return cls(**fields)
 
 
-# def draw_tree(node, g=None, level=0):
-#     """Use graphviz to draw a tree of nodes"""
-#     if level == 0:
-#         g = Digraph('G', filename='tree.gv')
+def node_to_tool(node: Node) -> Tool:
+    preconditions_str = ""
+    for precond in node.preconditions:
+        preconditions_str += f"- {precond.strip()}\n"
+    print(preconditions_str.strip())
 
-#     if node.node_type == "Condition":
-#         g.node(node.name, label=node.name)
-#     else:
-#         g.node(node.name, label=node.name, shape='box')
-
-#     for child in node.children:
-#         g.edge(node.name, child.name)
-#         draw_tree(child, g, level + 1)
-
-#     if level == 0:
-#         g.view()
-
-
-def book_a_ticket_func(str) -> str:
-    return ("failed to book a ticket")
-
-
-def plan_a_sequence_of_flights_func(str) -> str:
-    return ("failed to plan a sequence of flights")
-
-
-def plan_a_trip_func(str) -> str:
-    return ("failed to plan a trip")
-
-
-def main():
-    book_a_ticket = Node(
-        "Book a ticket",
-        "Given a location, a start date, and a budget, this tool automatically books a ticket",
-        "only if the destination and travel dates are defined",
-        book_a_ticket_func
-    )
-    plan_a_sequence_of_flights = Node(
-        "Plan a sequence of flights",
-        "Given a vague idea for travel, produces a sequence of flights proposed",
-        "only if the destinations are defined",
-        plan_a_sequence_of_flights_func
-    )
-    plan_a_trip = Node(
-        "Plan a trip",
-        "Given a vague idea for travel, tries to help you plan a trip",
-        "only if a vague travel idea is defined",
-        plan_a_trip_func
+    return Tool(
+        node.name,
+        lambda msg: f"Executing {node.name}",
+        f"""{node.description}
+PRECONDITIONS:
+{preconditions_str}
+        """,
     )
 
-    plan_a_trip.append(book_a_ticket)
-    plan_a_trip.append(plan_a_sequence_of_flights)
 
-    # draw_tree(plan_a_trip)
+def node_tool(fn: Callable) -> Tool:
+    node = Node.from_docstring(fn)
+    return node_to_tool(node)
 
-    tools = plan_a_trip.to_tools()
 
-    llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo")
+@node_tool
+def is_tip_available():
+    """
+    mode: condition
+    description: Check if the tip is available
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tip is available"
 
-    prompt = PromptTemplate(
-        input_variables=["q"],
-        template=template
+
+@node_tool
+def tip_stock_error():
+    """
+    mode: action
+    description: Handle tip stock error
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tip stock error"
+
+
+@node_tool
+def is_tip_available_in_tray():
+    """
+    mode: condition
+    description: Check if the tip is available in the tray
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tip is available in tray"
+
+
+@node_tool
+def is_discard_success():
+    """
+    mode: condition
+    description: Check if the discard was successful
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Discard was successful"
+
+
+@node_tool
+def tray_maintainance_error():
+    """
+    mode: action
+    description: Handle tray maintainance error
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tray maintainance error"
+
+
+@node_tool
+def is_load_new_tray_successful():
+    """
+    mode: condition
+    description: Check if the load new tray was successful
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Load new tray was successful"
+
+
+@node_tool
+def load_new_tray_maintenance_error():
+    """
+    mode: action
+    description: Handle load new tray maintainance error
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Load new tray maintainance error"
+
+
+@node_tool
+def is_already_in_position():
+    """
+    mode: condition
+    description: Check if the tip slider is already in position
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tip slider is already in position"
+
+
+@node_tool
+def is_slider_position_reached():
+    """
+    mode: condition
+    description: Check if the tip slider position was reached
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Tip slider position was reached"
+
+
+@node_tool
+def is_caught_tip_firm_and_oriented():
+    """
+    mode: condition
+    description: Check if the caught tip is firm and oriented
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Caught tip is firm and oriented"
+
+
+@node_tool
+def is_pick_up_success():
+    """
+    mode: condition
+    description: Check if the pick up was successful
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Pick up was successful"
+
+
+@node_tool
+def handle_pickup_failure():
+    """
+    mode: action
+    description: Handle pick up failure
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Pick up failure"
+
+
+@node_tool
+def move_slider_to_load_position():
+    """
+    mode: action
+    description: Move the tip slider to load position
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Moved tip slider to load position"
+
+
+@node_tool
+def load_next_tray():
+    """
+    mode: action
+    description: Load the next tray
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Loaded next tray"
+
+
+@node_tool
+def move_tip_slider_to_position():
+    """
+    mode: action
+    description: Move the tip slider to position
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Moved tip slider to position"
+
+
+@node_tool
+def pick_up_tip_using_gantry():
+    """
+    mode: action
+    description: Pick up tip using gantry
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Picked up tip using gantry"
+
+
+@node_tool
+def goto_discard_position():
+    """
+    mode: action
+    description: Go to discard position
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Went to discard position"
+
+
+@node_tool
+def prepare_to_discard():
+    """
+    mode: action
+    description: Prepare to discard
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Prepared to discard"
+
+
+@node_tool
+def eject_tip():
+    """
+    mode: action
+    description: Eject tip
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Ejected tip"
+
+
+@node_tool
+def is_discard_tip_successful():
+    """
+    mode: condition
+    description: Check if the discard tip was successful
+    preconditions: Pipette is present, Pipette is the actively mounted tool
+    """
+    return "Discard tip was successful"
+
+
+tools = [
+    is_tip_available,
+    tip_stock_error,
+    is_tip_available_in_tray,
+    is_discard_success,
+    move_slider_to_load_position,
+    load_next_tray,
+    is_load_new_tray_successful,
+    load_new_tray_maintenance_error,
+    is_already_in_position,
+    move_tip_slider_to_position,
+    is_slider_position_reached,
+    tray_maintainance_error,
+    pick_up_tip_using_gantry,
+    is_caught_tip_firm_and_oriented,
+    goto_discard_position,
+    prepare_to_discard,
+    eject_tip,
+    is_discard_tip_successful,
+    is_pick_up_success,
+    handle_pickup_failure
+]
+
+llm = OpenAI(temperature=0.0, model_name="gpt-3.5-turbo")
+
+
+prompt = PromptTemplate(
+    input_variables=["q"],
+    template=template
+)
+
+
+agent = initialize_agent(
+    tools, llm, agent="zero-shot-react-description", verbose=True)
+
+
+async def llmtree_agent():
+    q = "Task: Pick up the sample and place it in the PCR."
+    return agent.run(
+        q
     )
 
-    agent = initialize_agent(
-        tools, llm, agent="zero-shot-react-description", verbose=True)
 
-    q = input("Question: ")
-    output = agent.run(q)
-
-    print(output)
-
-
-if __name__ == "__main__":
-    main()
+langchain_visualizer.visualize(llmtree_agent)

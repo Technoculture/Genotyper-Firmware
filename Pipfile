@@ -8,6 +8,8 @@ openai = "*"
 langchain = "*"
 graphviz = "*"
 dotenv = "*"
+langchain-visualizer = "*"
+pydantic = "*"
 
 [dev-packages]
 ipykernel = "*"
