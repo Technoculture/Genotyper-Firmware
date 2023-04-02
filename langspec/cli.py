@@ -11,6 +11,9 @@ Task:
     - Given a task in english, generate a correct behavior tree
 """
 
+import os
+import json
+from datetime import datetime
 import langchain_visualizer
 from langchain.llms import OpenAI
 from langchain import LLMChain
@@ -40,32 +43,59 @@ tools = [
     handle_pickup_failure
 ]
 
-llm = OpenAI(temperature=0.0, model_name="gpt-3.5-turbo")
+tool_names = [tool.name for tool in tools]
+
+llm = OpenAI(temperature=0,
+             model_name="gpt-3.5-turbo",
+             verbose=True,
+             max_tokens=100
+             )
 
 prefix = """Given a task description, generate a sequence of actions that can be performed to complete the task.
+Only use the available tools to complete the task.
 You have access to the following tools:"""
-suffix = """\n\nQ: {q}\nA:"""
+suffix = """
+DO NOT REQUEST ACTIONS THAT ARE NOT IN THE TOOL LIST.
+BE VERY CAREFUL WITH THIS ONE.
+
+Task: {input}
+{agent_scratchpad}"""
 
 prompt = ZeroShotAgent.create_prompt(
     tools=tools,
     prefix=prefix,
     suffix=suffix,
-    input_variables=["q"],
+    input_variables=["input", "agent_scratchpad"],
 )
 
-print(prompt.template)
 
-llm_chain = LLMChain(llm=llm, prompt=prompt)
-agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=[
-                      tool.name for tool in tools])
+llm_chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
+agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=tool_names)
 
-agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools)
+agent_executor = AgentExecutor.from_agent_and_tools(
+    agent=agent,
+    tools=tools,
+    return_intermediate_steps=True,
+)
 
 
 async def llmtree_agent():
-    q = "Task: Pick up the sample and place it in the PCR."
-    return agent_executor.run(q)
+    q = "Pick up the sample and place it in the PCR."
+    output = {}
+    output["datetime"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    output["log"] = agent_executor({"input": q, "agent_scratchpad": ""})
 
+    file_path = "output.json"
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+        with open(file_path, "r") as jsonfile:
+            data = json.load(jsonfile)
+    else:
+        data = []
+    data.append(output)
+    with open(file_path, "w") as jsonfile:
+        json.dump(data, jsonfile, indent=2)
+
+    return output
 
 langchain_visualizer.visualize(llmtree_agent)
 

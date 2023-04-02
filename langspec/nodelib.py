@@ -2,27 +2,27 @@ from node import node_tool
 
 
 @node_tool
-def is_tip_available():
+def is_tip_available(input: str):
     """
     mode: condition
-    description: Check if the tip is available
-    preconditions: Pipette is present, Pipette is the actively mounted tool
+    description: Verify if a tip is available for use
+    preconditions: The pipette is attached to the system and selected as the active tool
     """
     return "Tip is available"
 
 
 @node_tool
-def tip_stock_error():
+def tip_stock_error(input: str):
     """
     mode: action
-    description: Handle tip stock error
-    preconditions: Pipette is present, Pipette is the actively mounted tool
+    description: Address an error related to the tip stock
+    preconditions: None 
     """
     return "Tip stock error"
 
 
 @node_tool
-def is_tip_available_in_tray():
+def is_tip_available_in_tray(input: str):
     """
     mode: condition
     description: Check if the tip is available in the tray
@@ -32,7 +32,7 @@ def is_tip_available_in_tray():
 
 
 @node_tool
-def is_discard_success():
+def is_discard_success(input: str):
     """
     mode: condition
     description: Check if the discard was successful
@@ -42,7 +42,7 @@ def is_discard_success():
 
 
 @node_tool
-def tray_maintainance_error():
+def tray_maintainance_error(input: str):
     """
     mode: action
     description: Handle tray maintainance error
@@ -52,7 +52,7 @@ def tray_maintainance_error():
 
 
 @node_tool
-def is_load_new_tray_successful():
+def is_load_new_tray_successful(input: str):
     """
     mode: condition
     description: Check if the load new tray was successful
@@ -62,7 +62,7 @@ def is_load_new_tray_successful():
 
 
 @node_tool
-def load_new_tray_maintenance_error():
+def load_new_tray_maintenance_error(input: str):
     """
     mode: action
     description: Handle load new tray maintainance error
@@ -72,7 +72,7 @@ def load_new_tray_maintenance_error():
 
 
 @node_tool
-def is_already_in_position():
+def is_already_in_position(input: str):
     """
     mode: condition
     description: Check if the tip slider is already in position
@@ -82,7 +82,7 @@ def is_already_in_position():
 
 
 @node_tool
-def is_slider_position_reached():
+def is_slider_position_reached(input: str):
     """
     mode: condition
     description: Check if the tip slider position was reached
@@ -92,7 +92,7 @@ def is_slider_position_reached():
 
 
 @node_tool
-def is_caught_tip_firm_and_oriented():
+def is_caught_tip_firm_and_oriented(input: str):
     """
     mode: condition
     description: Check if the caught tip is firm and oriented
@@ -102,7 +102,7 @@ def is_caught_tip_firm_and_oriented():
 
 
 @node_tool
-def is_pick_up_success():
+def is_pick_up_success(input: str):
     """
     mode: condition
     description: Check if the pick up was successful
@@ -112,7 +112,7 @@ def is_pick_up_success():
 
 
 @node_tool
-def handle_pickup_failure():
+def handle_pickup_failure(input: str):
     """
     mode: action
     description: Handle pick up failure
@@ -122,7 +122,7 @@ def handle_pickup_failure():
 
 
 @node_tool
-def move_slider_to_load_position():
+def move_slider_to_load_position(input: str):
     """
     mode: action
     description: Move the tip slider to load position
@@ -132,7 +132,7 @@ def move_slider_to_load_position():
 
 
 @node_tool
-def load_next_tray():
+def load_next_tray(input: str):
     """
     mode: action
     description: Load the next tray
@@ -142,7 +142,7 @@ def load_next_tray():
 
 
 @node_tool
-def move_tip_slider_to_position():
+def move_tip_slider_to_position(input: str):
     """
     mode: action
     description: Move the tip slider to position
@@ -152,7 +152,7 @@ def move_tip_slider_to_position():
 
 
 @node_tool
-def pick_up_tip_using_gantry():
+def pick_up_tip_using_gantry(input: str):
     """
     mode: action
     description: Pick up tip using gantry
@@ -162,7 +162,7 @@ def pick_up_tip_using_gantry():
 
 
 @node_tool
-def goto_discard_position():
+def goto_discard_position(input: str):
     """
     mode: action
     description: Go to discard position
@@ -172,7 +172,7 @@ def goto_discard_position():
 
 
 @node_tool
-def prepare_to_discard():
+def prepare_to_discard(input: str):
     """
     mode: action
     description: Prepare to discard
@@ -182,7 +182,7 @@ def prepare_to_discard():
 
 
 @node_tool
-def eject_tip():
+def eject_tip(input: str):
     """
     mode: action
     description: Eject tip
@@ -192,7 +192,7 @@ def eject_tip():
 
 
 @node_tool
-def is_discard_tip_successful():
+def is_discard_tip_successful(input: str):
     """
     mode: condition
     description: Check if the discard tip was successful

@@ -3,3 +3,8 @@ langchain
 graphviz
 langchain-visualizer
 pydantic
+wandb
+pandas
+spacy
+textstat
+

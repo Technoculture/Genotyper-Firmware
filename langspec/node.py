@@ -1,6 +1,5 @@
-from graphviz import Digraph
 from enum import Enum
-from typing import Callable, List, Optional
+from typing import Callable, List
 import re
 from pydantic import BaseModel
 from langchain.agents import Tool
@@ -40,12 +39,12 @@ class Node(BaseModel):
 
 def node_to_tool(node: Node) -> Tool:
     preconditions_str = (", ".join(node.preconditions))
-    print(preconditions_str)
+    # print(preconditions_str)
 
     return Tool(
         node.name,
-        lambda msg: f"Executing {node.name}",
-        f"{node.description}, PRECONDITIONS = {preconditions_str}",
+        node.executor,
+        f"{node.description} [!!! PRECONDITIONS = {preconditions_str}]",
     )
 
 
