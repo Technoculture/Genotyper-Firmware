@@ -2,6 +2,8 @@
 
 Idea is to have a library of behaviour tree action and conditional nodes. Allow LLM to combine them in sequences to create behaviours in response to user requests.
 
+> Keywords: Behaviour Tree, LLM, Language Models, Task Generation, Few-Shot Learning, Prompt Programming
+
 # Example
 > User: "Pick up the sample and place it in the PCR."
 >
