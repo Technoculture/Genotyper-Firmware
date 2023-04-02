@@ -1,7 +1,3 @@
-import os
-import sys
-import yaml
-
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
 from langchain.agents import tool, Tool
@@ -10,8 +6,14 @@ from langchain.agents import initialize_agent
 from typing import Callable, List, Optional
 from enum import Enum
 
+from graphviz import Digraph
+
 template = """
-Given the a question, answer it. If one of tools appear to be useful, always use them.
+Given the question, answer it. If one of tools appear to be useful, use them IF AND ONLY IF the preconditions are satisfied. Otherwise, use the default answer.
+
+BE EXTRA CAREFUL WHEN USING TOOLS. ALWAYS PRIORITIZE SAFETY OVER CONVENIENCE.
+
+NEVER USE TOOLS FOR WHICH THE PRECONDITIONS ARE NOT SATISFIED.
 
 Question: {q}
 """
@@ -27,11 +29,21 @@ class Node:
     def __init__(self,
                  name: str,
                  description: str,
+                 precondition: str,
                  func: Callable = lambda: None,
                  *, is_selector=False):
         self.children = []
         self.name = name
         self.description = description
+        if precondition:
+            self.description += f"""
+            Please make sure that this node is only ever executed in conditions that fulfill the following
+            
+            pre-condition: 
+            {precondition}. 
+            
+            PRECONDITIONS ARE ESSENTIAL FOR THE SAFETY OF THE SYSTEM. ALWAYS PRIORITIZE SAFETY OVER CONVENIENCE.
+            """
         self.func = func
         self.is_selector = is_selector
 
@@ -70,20 +82,62 @@ class Node:
         return tools
 
 
+# def draw_tree(node, g=None, level=0):
+#     """Use graphviz to draw a tree of nodes"""
+#     if level == 0:
+#         g = Digraph('G', filename='tree.gv')
+
+#     if node.node_type == "Condition":
+#         g.node(node.name, label=node.name)
+#     else:
+#         g.node(node.name, label=node.name, shape='box')
+
+#     for child in node.children:
+#         g.edge(node.name, child.name)
+#         draw_tree(child, g, level + 1)
+
+#     if level == 0:
+#         g.view()
+
+
+def book_a_ticket_func(str) -> str:
+    return ("failed to book a ticket")
+
+
+def plan_a_sequence_of_flights_func(str) -> str:
+    return ("failed to plan a sequence of flights")
+
+
+def plan_a_trip_func(str) -> str:
+    return ("failed to plan a trip")
+
+
 def main():
     book_a_ticket = Node(
-        "Book a ticket", "Given a location, a start date, and a budget, this tool automatically books a ticket")
+        "Book a ticket",
+        "Given a location, a start date, and a budget, this tool automatically books a ticket",
+        "only if the destination and travel dates are defined",
+        book_a_ticket_func
+    )
     plan_a_sequence_of_flights = Node(
-        "Plan a sequence of flights", "Given a vague idea for travel, produces a sequence of flights proposed")
+        "Plan a sequence of flights",
+        "Given a vague idea for travel, produces a sequence of flights proposed",
+        "only if the destinations are defined",
+        plan_a_sequence_of_flights_func
+    )
     plan_a_trip = Node(
-        "Plan a trip", "Given a vague idea for travel, tries to help you plan a trip")
+        "Plan a trip",
+        "Given a vague idea for travel, tries to help you plan a trip",
+        "only if a vague travel idea is defined",
+        plan_a_trip_func
+    )
 
     plan_a_trip.append(book_a_ticket)
     plan_a_trip.append(plan_a_sequence_of_flights)
 
-    tools = plan_a_trip.to_tools()
+    # draw_tree(plan_a_trip)
 
-    [print(t.name) for t in tools]
+    tools = plan_a_trip.to_tools()
 
     llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo")
 
