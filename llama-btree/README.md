@@ -8,7 +8,7 @@ Idea is to have a library of behaviour tree action and conditional nodes. Allow 
 > User: "Pick up the sample and place it in the PCR."
 >
 > LLM: 
-![](./assets/behavior_tree.png)
+![](./assets/agent_actions.png)
 
 # Evaluation
  - Effect of temperature on the agent's performance
