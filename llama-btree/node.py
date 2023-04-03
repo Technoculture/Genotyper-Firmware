@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Callable, List
+from typing import Callable, List, Optional
 import re
 from pydantic import BaseModel
 from langchain.agents import Tool
@@ -15,7 +15,9 @@ class Node(BaseModel):
     mode: NodeMode
     description: str
     executor: Callable
-    preconditions: List[str]
+    preconditions: Optional[List[str]] = None
+    needs_tool: Optional[str] = None
+    input_format: Optional[str] = None
 
     @classmethod
     def from_docstring(cls, fn: Callable):
@@ -38,13 +40,13 @@ class Node(BaseModel):
 
 
 def node_to_tool(node: Node) -> Tool:
-    preconditions_str = (", ".join(node.preconditions))
-    # print(preconditions_str)
+    need_tool_str = f"NEEDS TOOL = {node.needs_tool}" if node.needs_tool else ""
+    preconditions_str = f"!!! PRECONDITIONS = {', '.join(node.preconditions)}" if node.preconditions else "No preconditions"
 
     return Tool(
         node.name,
         node.executor,
-        f"{node.description} [!!! PRECONDITIONS = {preconditions_str}]",
+        f"{node.description}; [{preconditions_str}; {need_tool_str}]; Accepts inputs of the form: {node.input_format}",
     )
 
 

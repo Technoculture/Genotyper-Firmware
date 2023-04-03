@@ -15,9 +15,10 @@ import os
 import json
 from datetime import datetime
 import langchain_visualizer
-from langchain.llms import OpenAI
+from langchain.llms import OpenAI, HuggingFacePipeline
 from langchain import LLMChain
 from langchain.agents import ZeroShotAgent, AgentExecutor
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from nodelib import *
 
 tools = [
@@ -45,11 +46,28 @@ tools = [
 
 tool_names = [tool.name for tool in tools]
 
-llm = OpenAI(temperature=0,
-             model_name="gpt-3.5-turbo",
-             verbose=True,
-             max_tokens=100
-             )
+
+def get_llm(*, vendor: str = "openai", model_name: str = ""):
+    if vendor == "openai":
+        model_name = "gpt-3.5-turbo" if model_name == "" else model_name
+        llm = OpenAI(temperature=0, model_name=model_name, verbose=True)
+        return llm
+    elif vendor == "hf":
+        model_name = "cerebras/Cerebras-GPT-111M" if model_name == "" else model_name
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForCausalLM.from_pretrained(model_name)
+        pipe = pipeline(
+            "text-generation", model=model, tokenizer=tokenizer,
+            max_new_tokens=100, early_stopping=True, no_repeat_ngram_size=2
+        )
+        llm = HuggingFacePipeline(pipeline=pipe, verbose=True)
+        return llm
+    else:
+        raise ValueError("Invalid vendor")
+
+
+llm = get_llm()
+
 
 prefix = """Given a task description, generate a sequence of actions that can be performed to complete the task.
 Only use the available tools to complete the task.

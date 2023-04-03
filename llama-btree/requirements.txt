@@ -1,3 +1,4 @@
+torch
 openai
 langchain
 graphviz
@@ -7,4 +8,6 @@ wandb
 pandas
 spacy
 textstat
+transformers
+google-search-results
 

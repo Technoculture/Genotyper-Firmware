@@ -1,14 +1,35 @@
 from node import node_tool
 
 
+def send(address, payload):
+    """
+    Uses zenoh endpoint (address) to send payload
+    """
+    ...
+
+
+async def send_and_await_response(address, payload) -> str:
+    """
+    Uses zenoh endpoint (address) to send payload and waits for a response
+    """
+    
+    return "Response"
+
+
 @node_tool
-def is_tip_available(input: str):
+async def is_tip_available(input: str):
     """
     mode: condition
     description: Verify if a tip is available for use
     preconditions: The pipette is attached to the system and selected as the active tool
+    needs_tool: A Pipette
+    input_format: Either of 10ul, 100ul or 1000ul ONLY
     """
-    return "Tip is available"
+    if input not in ["10ul", "100ul", "1000ul"]:
+        return f"Tip of size {input} is not available"
+
+    response = await send_and_await_response("pipette/tip_slider/position", "0")
+    return response
 
 
 @node_tool
@@ -16,7 +37,6 @@ def tip_stock_error(input: str):
     """
     mode: action
     description: Address an error related to the tip stock
-    preconditions: None 
     """
     return "Tip stock error"
 
@@ -26,7 +46,6 @@ def is_tip_available_in_tray(input: str):
     """
     mode: condition
     description: Check if the tip is available in the tray
-    preconditions: Pipette is present, Pipette is the actively mounted tool
     """
     return "Tip is available in tray"
 
@@ -37,6 +56,7 @@ def is_discard_success(input: str):
     mode: condition
     description: Check if the discard was successful
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Discard was successful"
 
@@ -97,6 +117,7 @@ def is_caught_tip_firm_and_oriented(input: str):
     mode: condition
     description: Check if the caught tip is firm and oriented
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Caught tip is firm and oriented"
 
@@ -107,6 +128,7 @@ def is_pick_up_success(input: str):
     mode: condition
     description: Check if the pick up was successful
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Pick up was successful"
 
@@ -117,6 +139,7 @@ def handle_pickup_failure(input: str):
     mode: action
     description: Handle pick up failure
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Pick up failure"
 
@@ -127,6 +150,7 @@ def move_slider_to_load_position(input: str):
     mode: action
     description: Move the tip slider to load position
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Moved tip slider to load position"
 
@@ -137,6 +161,7 @@ def load_next_tray(input: str):
     mode: action
     description: Load the next tray
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Loaded next tray"
 
@@ -147,6 +172,7 @@ def move_tip_slider_to_position(input: str):
     mode: action
     description: Move the tip slider to position
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Moved tip slider to position"
 
@@ -157,6 +183,7 @@ def pick_up_tip_using_gantry(input: str):
     mode: action
     description: Pick up tip using gantry
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Picked up tip using gantry"
 
@@ -167,6 +194,7 @@ def goto_discard_position(input: str):
     mode: action
     description: Go to discard position
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Went to discard position"
 
@@ -177,6 +205,7 @@ def prepare_to_discard(input: str):
     mode: action
     description: Prepare to discard
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Prepared to discard"
 
@@ -187,6 +216,7 @@ def eject_tip(input: str):
     mode: action
     description: Eject tip
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Ejected tip"
 
@@ -197,5 +227,6 @@ def is_discard_tip_successful(input: str):
     mode: condition
     description: Check if the discard tip was successful
     preconditions: Pipette is present, Pipette is the actively mounted tool
+    needs_tool: A Pipette
     """
     return "Discard tip was successful"

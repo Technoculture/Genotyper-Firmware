@@ -11,6 +11,11 @@ dotenv = "*"
 langchain-visualizer = "*"
 pydantic = "*"
 wandb = "*"
+pandas = "*"
+spacy = "*"
+textstat = "*"
+transformers = "*"
+google-search-results = "*"
 
 [dev-packages]
 ipykernel = "*"
