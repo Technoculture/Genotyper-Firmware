@@ -16,6 +16,7 @@ spacy = "*"
 textstat = "*"
 transformers = "*"
 google-search-results = "*"
+yaml = "*"
 
 [dev-packages]
 ipykernel = "*"

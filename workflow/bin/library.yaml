@@ -1,0 +1,46 @@
+modules:
+
+  - name: Tip Resource Manager
+    type: Resorce Manager
+    address: modules/tip_rm
+    annotation:
+      abbr: TipRM
+      description: Tip RM manages tip boxes with various tip sizes in them
+
+tools:
+  
+  - name: No Tool
+    annotation: 
+      abbr: NoTool
+      description: Represents no tool mounted on the tool change head
+
+  - name: Pipette
+    annotation:
+      abbr: PipTool
+      description: Pipette allows to pick and drop variable volumes of liquid
+      pick_up: NoTool
+
+    variants:
+      - name: 10uL
+        annotation:
+          abbr: 10 
+          preffered_when: The range of liquid to be picked up is between 10 and 100 microliters
+
+      - name: 100uL
+        annotation:
+          abbr: 100
+          preffered_when: The range of liquid to be picked up is between 100 and 1000 microliters
+
+nodes:
+
+  - name: is_tip_available
+    type: condition
+    zenoh:
+      modules:
+        - TipRM
+      min_reply: from_any
+    annotation:
+      description: Checks if a tip is is_tip_available
+      need_module: TipRM
+      needs_tool: PipTool
+

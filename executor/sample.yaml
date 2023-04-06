@@ -1,0 +1,68 @@
+workflow:
+  name: ExampleWorkflow
+  steps:
+    - name: Step1
+      btree:
+        name: BTree1
+        nodes:
+          - name: StartSequence
+            type: sequence
+            children:
+              - name: CheckInventory
+                type: condition
+              - name: CheckError
+                type: error
+          - name: PerformAction
+            type: action
+            children:
+              - name: RetrieveItem
+                type: action
+              - name: DeliverItem
+                type: action
+          - name: ErrorHandling
+            type: error
+            children:
+              - name: FatalError
+                type: error
+                error_type: 1
+              - name: InventoryError
+                type: error
+                error_type: 2
+              - name: MaintainableError
+                type: error
+                error_type: 3
+              - name: InspectableError
+                type: error
+                error_type: 4
+              - name: InventoryWarning
+                type: error
+                error_type: 5
+              - name: RecoverableError
+                type: error
+                error_type: 6
+    - name: Step2
+      btree:
+        name: BTree2
+        nodes:
+          - name: PrepareSequence
+            type: sequence
+            children:
+              - name: CheckStatus
+                type: condition
+              - name: VerifyAction
+                type: action
+          - name: ExecuteAction
+            type: action
+            children:
+              - name: AssembleItem
+                type: action
+              - name: TestItem
+                type: action
+          - name: CleanupSequence
+            type: sequence
+            children:
+              - name: UpdateInventory
+                type: action
+              - name: LogCompletion
+                type: action
+
