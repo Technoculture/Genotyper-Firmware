@@ -1,12 +1,14 @@
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::fs::File;
+use std::io::Write;
+//use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Library {
     modules: Vec<Module>,
     tools: Vec<Tool>,
-    nodes: Vec<Node>,
+    nodes: Vec<KnownNode>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -51,7 +53,7 @@ enum NodeType {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Node {
+struct KnownNode {
     name: String,
     #[serde(rename = "type")]
     node_type: NodeType,
@@ -76,11 +78,35 @@ struct Zenoh {
     min_reply: ReplyMode,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Node {
+    name: String,
+    error: Option<String>,
+    children: Option<Vec<Node>>,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct BehaviorTree {
+    tree: Vec<Node>
+}
+
+fn serialize_behaviour_tree(tree: &BehaviorTree, file_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let yaml_string = serde_yaml::to_string(&tree).expect("Failed to serialize tree");
+    let mut file = File::create(file_name).expect("Failed to create file");
+    file.write_all(yaml_string.as_bytes()).expect("Failed to write to file");
+    Ok(())
+}
+
+fn deserialize_behaviour_tree(file_name: &str) -> Result<BehaviorTree, Box<dyn std::error::Error>> {
+    let file = File::open(file_name).expect("Failed to open file");
+    let tree: BehaviorTree = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
+    Ok(tree)
+}
+
 fn main() -> Result<(), serde_yaml::Error> {
     // Read all YAML files
     // ----
     //
-
     let library_path = "library/";
     let nodes_file_name = "nodes.yaml";
     let modules_file_name = "modules.yaml";
@@ -117,7 +143,7 @@ fn main() -> Result<(), serde_yaml::Error> {
     // Load the nodes
     let nodes_file =
         File::open(library_path.to_owned() + nodes_file_name).expect("Unable to open file");
-    let nodes: Vec<Node> = serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
+    let nodes: Vec<KnownNode> = serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
     //println!("{:#?}", nodes);
 
     // Throw an error if a node is using a module that is not known
@@ -125,17 +151,19 @@ fn main() -> Result<(), serde_yaml::Error> {
         if let Some(z) = &n.zenoh {
             z.modules.iter().for_each(|m| {
                 if !known_dependencies.contains(m) {
-                    panic!("Node {} is using an unknown module {}", n.name, m);
+                    panic!("KnownNode {} is using an unknown module {}", n.name, m);
                 }
             });
         }
     });
 
-    println!("Node Library is valid and ready to be used");
+    println!("KnownNode Library is valid and ready to be used");
 
     // ----
     //
-
+    let btree = deserialize_behaviour_tree("btree.yaml").expect("Failed to deserialize tree");
+    println!("{:#?}", btree);
+    println!("btree.yaml is valid and parsed correctly");
 
     Ok(())
 }

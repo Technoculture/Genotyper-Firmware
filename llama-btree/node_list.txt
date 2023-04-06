@@ -1,6 +1,7 @@
 #attempt_pickup_tip
  is_tip_available
    tip_stock_error
+
  #prepare_tip_for_pickup
   is_tip_available_in_tray
    #discard_current_tray
@@ -11,11 +12,13 @@
     load_next_tray
    is_load_new_tray_successful
     load_new_tray_maintenance_error
+
   #position_tip_slider
    is_already_in_position
    move_tip_slider_to_position
    is_slider_position_reached
     tray_maintainance_error
+
  #pick_up_using_gantry
   pick_up_tip_using_gantry
   is_caught_tip_firm_and_oriented
@@ -24,6 +27,7 @@
     prepare_to_discard
     eject_tip
     is_discard_tip_successful
+
  is_pick_up_success
   handle_pickup_failure
 
