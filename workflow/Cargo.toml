@@ -18,4 +18,3 @@ path = "bin/proto1.rs"
 [[bin]]
 name = "nodes"
 path = "bin/nodes.rs"
-

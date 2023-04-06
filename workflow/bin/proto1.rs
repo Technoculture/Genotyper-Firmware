@@ -63,7 +63,9 @@ fn main() {
             println!("is_tip_available");
             Ok(true)
         },
-        fail: Box::new(BehaviorTreeNode::Error(ExecutionError::ActionFailed("is_tip_available".to_string()))),
+        fail: Box::new(BehaviorTreeNode::Error(ExecutionError::ActionFailed(
+            "is_tip_available".to_string(),
+        ))),
     };
 
     let is_tip_available_node = BehaviorTreeNode::Condition(is_tip_available);
@@ -90,9 +92,7 @@ fn main() {
         behavior_tree: sequence_node,
     };
 
-    let workflow = Workflow {
-        tasks: vec![task],
-    };
+    let workflow = Workflow { tasks: vec![task] };
 
     let mut workflow = workflow;
 
@@ -124,10 +124,12 @@ fn main() {
             let result = (action.func)();
 
             match result {
-                Ok(_) => BehaviorTreeNode::Error(ExecutionError::Cancelled("Workflow complete".to_string())),
+                Ok(_) => BehaviorTreeNode::Error(ExecutionError::Cancelled(
+                    "Workflow complete".to_string(),
+                )),
                 Err(error) => BehaviorTreeNode::Error(error),
             }
-        },
+        }
         Ok(false) => *condition.fail,
         Err(error) => BehaviorTreeNode::Error(error),
     };

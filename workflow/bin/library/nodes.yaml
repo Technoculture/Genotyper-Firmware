@@ -1,0 +1,136 @@
+- name: is_tip_available
+  type: condition
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_any
+  description: Checks if a tip is is_tip_available
+
+- name: tip_stock_error
+  type: error
+  description: There is an error related to to stock / inventory
+
+- name: is_tip_available_in_tray
+  type: condition
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_any
+  description: There is an error related to to stock / inventory
+
+
+- name: is_discard_success
+  type: condition
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: tray_maintainance_error
+  type: error
+  description: There is an error related to to stock / inventory
+
+
+- name: move_slider_to_load_position
+  type: action
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: load_next_tray
+  type: action
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: load_new_tray_maintainance_error
+  type: error
+  description: There is an error related to to stock / inventory
+
+
+- name: is_already_in_position
+  type: condition
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: move_tip_slider_to_position
+  type: action
+  zenoh: 
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: is_slider_position_reached
+  type: condition
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: tray_maintainance_error
+  type: error
+  description: There is an error related to to stock / inventory
+
+
+- name: pick_up_tip_using_gantry
+  type: action
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: is_caught_tip_firm_and_gantry
+  type: condition
+  zenoh:
+    modules:
+      - Pipette
+    min_reply: from_one
+    input_variable: active_pipette
+  description: There is an error related to to stock / inventory
+
+
+- name: goto_discard_position
+  type: action
+  zenoh:
+    modules:
+      - Gantry
+    min_reply: from_any
+  description: There is an error related to to stock / inventory
+
+
+- name: prepare_to_discard
+  type: action
+  zenoh:
+    modules:
+      - TipRM
+    min_reply: from_one
+  description: There is an error related to to stock / inventory
+
+
+- name: eject_tip
+  type: action
+  zenoh:
+    modules:
+      - Pipette
+      - TipRM
+    min_reply: from_any
+  description: ...
+

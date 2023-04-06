@@ -1,0 +1,10 @@
+name: Get Tip
+version: 0.0.1
+description: This behaviour tree co-ordinates all actions involved in getting a tip
+
+participant_modules:
+  - TipRM
+  - Gantry
+
+tree:
+  - 
