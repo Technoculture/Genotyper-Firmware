@@ -3,6 +3,9 @@ use serde_yaml;
 use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
+use log::info;
+
+use simplelog::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Library {
@@ -97,7 +100,7 @@ struct BehaviorTreeFile {
 fn load_a_behaviour_tree(file_name: &str) -> Result<BehaviorTreeFile, Box<dyn std::error::Error>> {
     let file = File::open(file_name).expect("Failed to open file");
     let tree: BehaviorTreeFile = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
-    println!("{:#?}", tree);
+    info!("{:#?}", tree);
     Ok(tree)
 }
 
@@ -117,7 +120,7 @@ fn load_file_modules(path: &str) -> Result<HashMap<String, Module>, Box<dyn std:
             .expect(format!("Unable to open file {}", &path).as_str());
     let modules: HashMap<String, Module> =
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
-    println!("Modules file is valid and parsed correctly");
+    info!("Modules file is valid and parsed correctly");
     Ok(modules)
 }
 
@@ -126,7 +129,7 @@ fn load_file_tools(path: &str) -> Result<HashMap<String, Tool>, Box<dyn std::err
     let tools_file = File::open(path).expect("Unable to open file");
     let tools: HashMap<String, Tool> =
         serde_yaml::from_reader(tools_file).expect("Unable to parse tools");
-    println!("Tools file is valid and parsed correctly");
+    info!("Tools file is valid and parsed correctly");
     Ok(tools)
 }
 
@@ -137,7 +140,7 @@ fn load_file_nodes(
     let nodes_file = File::open(path).expect("Unable to open file");
     let nodes: HashMap<String, KnownNode> =
         serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
-    println!("Nodes file is valid and parsed correctly");
+    info!("Nodes file is valid and parsed correctly");
     Ok(nodes)
 }
 
@@ -153,7 +156,7 @@ fn dependencies_abbr(
     for (name, _) in tools {
         abbrs.push(name.clone());
     }
-    println!("Modules and Tools in Library: {:?}", &abbrs);
+    info!("Modules and Tools in Library: {:?}", &abbrs);
     abbrs
 }
 
@@ -173,7 +176,7 @@ fn validate_nodes_library(
             }
         }
     }
-    println!("KnownNode Library is valid and ready to be used");
+    info!("KnownNode Library is valid and ready to be used");
     Ok(())
 }
 
@@ -215,7 +218,7 @@ fn validate_btree(
 
     validate_node(&tree_file.tree, &library).expect("Failed to validate node");
 
-    println!("Behavior Tree file {} is valid and ready to be used", tree_file.tree.name);
+    info!("Behavior Tree file {} is valid and ready to be used", tree_file.tree.name);
 
     Ok(())
 }
@@ -258,6 +261,11 @@ fn library_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
 }
 
 fn main() -> Result<(), serde_yaml::Error> {
+    // Intiate the logger
+    CombinedLogger::init(
+        vec![TermLogger::new(LevelFilter::Trace, Config::default(), TerminalMode::Mixed, ColorChoice::Auto)]).unwrap();
+
+
     // Load the library
     let library_path = library_path().expect("Unable to find library path");
     let library = load_library(&library_path).expect("Failed to load library");
@@ -271,8 +279,8 @@ fn main() -> Result<(), serde_yaml::Error> {
 
     //let mut names = Vec::new();
     //extract_names(&btree_file.tree, &mut names);
-    //println!("Nodes in Tree File: {:?}", names);
-    println!("btree.yaml is valid and parsed correctly");
+    //info!("Nodes in Tree File: {:?}", names);
+    info!("btree.yaml is valid and parsed correctly");
 
     Ok(())
 }
