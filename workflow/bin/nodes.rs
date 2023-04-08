@@ -1,17 +1,23 @@
+use log::info;
+use semver::Version;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
+use simplelog::*;
 use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
-use log::info;
-
-use simplelog::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Library {
-    modules: HashMap<String, Module>,
-    tools: HashMap<String, Tool>,
-    nodes: HashMap<String, KnownNode>,
+    modules: ModuleFile,
+    tools: ToolFile,
+    nodes: KnownNodesFile,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ModuleFile {
+    version: String,
+    content: HashMap<String, Module>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -21,6 +27,12 @@ struct Module {
     module_type: String,
     address: String,
     description: String,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct ToolFile {
+    version: String,
+    content: HashMap<String, Tool>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -47,6 +59,12 @@ enum NodeType {
     Action,
     Sequence,
     Error,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct KnownNodesFile {
+    version: String,
+    content: HashMap<String, KnownNode>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -113,47 +131,46 @@ fn load_a_behaviour_tree(file_name: &str) -> Result<BehaviorTreeFile, Box<dyn st
 //    }
 //}
 
-fn load_file_modules(path: &str) -> Result<HashMap<String, Module>, Box<dyn std::error::Error>> {
+fn load_file_modules(path: &str) -> Result<ModuleFile, Box<dyn std::error::Error>> {
     // Load the modules
-    let modules_file =
-        File::open(&path)
-            .expect(format!("Unable to open file {}", &path).as_str());
-    let modules: HashMap<String, Module> =
+    let modules_file = File::open(&path).expect(format!("Unable to open file {}", &path).as_str());
+    let modules_file_data: ModuleFile =
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
+    Version::parse(&modules_file_data.version).expect("Version is not a valid semver version");
+
     info!("Modules file is valid and parsed correctly");
-    Ok(modules)
+    Ok(modules_file_data)
 }
 
-fn load_file_tools(path: &str) -> Result<HashMap<String, Tool>, Box<dyn std::error::Error>> {
+fn load_file_tools(path: &str) -> Result<ToolFile, Box<dyn std::error::Error>> {
     // Load the tools
     let tools_file = File::open(path).expect("Unable to open file");
-    let tools: HashMap<String, Tool> =
+    let tools_file_data: ToolFile =
         serde_yaml::from_reader(tools_file).expect("Unable to parse tools");
+    Version::parse(&tools_file_data.version).expect("Version is not a valid semver version");
+
     info!("Tools file is valid and parsed correctly");
-    Ok(tools)
+    Ok(tools_file_data)
 }
 
-fn load_file_nodes(
-    path: &str,
-) -> Result<HashMap<String, KnownNode>, Box<dyn std::error::Error>> {
+fn load_file_nodes(path: &str) -> Result<KnownNodesFile, Box<dyn std::error::Error>> {
     // Load the nodes
     let nodes_file = File::open(path).expect("Unable to open file");
-    let nodes: HashMap<String, KnownNode> =
+    let nodes_file_data: KnownNodesFile =
         serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
+    Version::parse(&nodes_file_data.version).expect("Version is not a valid semver version");
+
     info!("Nodes file is valid and parsed correctly");
-    Ok(nodes)
+    Ok(nodes_file_data)
 }
 
-fn dependencies_abbr(
-    modules: &HashMap<String, Module>,
-    tools: &HashMap<String, Tool>,
-) -> Vec<String> {
+fn dependencies_abbr(modules_file_data: &ModuleFile, tools_file_data: &ToolFile) -> Vec<String> {
     // modules and tools are the same, so we need to collect both their abbr in a single vector
     let mut abbrs = Vec::new();
-    for (name, _) in modules {
+    for (name, _) in modules_file_data.content.iter() {
         abbrs.push(name.clone());
     }
-    for (name, _) in tools {
+    for (name, _) in tools_file_data.content.iter() {
         abbrs.push(name.clone());
     }
     info!("Modules and Tools in Library: {:?}", &abbrs);
@@ -161,11 +178,11 @@ fn dependencies_abbr(
 }
 
 fn validate_nodes_library(
-    nodes: &HashMap<String, KnownNode>,
+    nodes_file_data: &KnownNodesFile,
     known_dependencies: &Vec<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Throw an error if a node is using a module that is not known
-    for (name, node) in nodes {
+    for (name, node) in nodes_file_data.content.iter() {
         if let Some(zenoh) = &node.zenoh {
             for module in &zenoh.modules {
                 if !known_dependencies.contains(module) {
@@ -180,14 +197,15 @@ fn validate_nodes_library(
     Ok(())
 }
 
-fn load_library(library_path: &PathBuf) 
-    -> Result<Library, Box<dyn std::error::Error>> 
-{
-    let modules = load_file_modules(library_path.join("modules.yaml").to_str().unwrap()).expect("Failed to load modules");
-    let tools = load_file_tools(library_path.join("tools.yaml").to_str().unwrap()).expect("Failed to load tools");
+fn load_library(library_path: &PathBuf) -> Result<Library, Box<dyn std::error::Error>> {
+    let modules = load_file_modules(library_path.join("modules.yaml").to_str().unwrap())
+        .expect("Failed to load modules");
+    let tools = load_file_tools(library_path.join("tools.yaml").to_str().unwrap())
+        .expect("Failed to load tools");
     let known_dependencies = dependencies_abbr(&modules, &tools);
 
-    let nodes = load_file_nodes(library_path.join("nodes.yaml").to_str().unwrap()).expect("Failed to load nodes");
+    let nodes = load_file_nodes(library_path.join("nodes.yaml").to_str().unwrap())
+        .expect("Failed to load nodes");
     validate_nodes_library(&nodes, &known_dependencies).expect("Failed to validate nodes library");
     Ok(Library {
         modules,
@@ -201,7 +219,7 @@ fn validate_btree(
     library: &Library,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Check if btree name is not a known node
-    if library.nodes.contains_key(&tree_file.tree.name) {
+    if library.nodes.content.contains_key(&tree_file.tree.name) {
         return Err(format!(
             "Behavior Tree name {} is already used by a known node",
             tree_file.tree.name
@@ -211,14 +229,17 @@ fn validate_btree(
 
     // Check if participants are known
     for participant in &tree_file.participants {
-        if !library.modules.contains_key(participant) {
+        if !library.modules.content.contains_key(participant) {
             return Err(format!("Participant Module {} is not a known node", participant).into());
         }
     }
 
     validate_node(&tree_file.tree, &library).expect("Failed to validate node");
 
-    info!("Behavior Tree file {} is valid and ready to be used", tree_file.tree.name);
+    info!(
+        "Behavior Tree file {} is valid and ready to be used",
+        tree_file.tree.name
+    );
 
     Ok(())
 }
@@ -245,7 +266,7 @@ fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn std::erro
         }
     } else {
         // If a node has no children, check if it is a known node
-        if !library.nodes.contains_key(&tree.name) {
+        if !library.nodes.content.contains_key(&tree.name) {
             return Err(format!("Node {} is not a known node", tree.name).into());
         }
     }
@@ -262,9 +283,13 @@ fn library_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
 
 fn main() -> Result<(), serde_yaml::Error> {
     // Intiate the logger
-    CombinedLogger::init(
-        vec![TermLogger::new(LevelFilter::Trace, Config::default(), TerminalMode::Mixed, ColorChoice::Auto)]).unwrap();
-
+    CombinedLogger::init(vec![TermLogger::new(
+        LevelFilter::Trace,
+        Config::default(),
+        TerminalMode::Mixed,
+        ColorChoice::Auto,
+    )])
+    .unwrap();
 
     // Load the library
     let library_path = library_path().expect("Unable to find library path");
@@ -274,7 +299,8 @@ fn main() -> Result<(), serde_yaml::Error> {
     let mut btree_file_path = library_path.clone();
     btree_file_path.push("trees");
     btree_file_path.push("attempt_pickup_tip-0.0.1.yaml");
-    let btree_file = load_a_behaviour_tree(btree_file_path.to_str().unwrap()).expect("Failed to deserialize tree");
+    let btree_file = load_a_behaviour_tree(btree_file_path.to_str().unwrap())
+        .expect("Failed to deserialize tree");
     validate_btree(&btree_file, &library).expect("Failed to validate tree");
 
     //let mut names = Vec::new();

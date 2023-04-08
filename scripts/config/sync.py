@@ -14,11 +14,8 @@ def copy_directory(src: str, dst: str) -> None:
     if not os.path.exists(src):
         print(f"Source directory {src} does not exist.")
         return
-    if os.path.exists(dst):
-        print(f"Destination directory {dst} already exists.")
-        return
     try:
-        shutil.copytree(src, dst)
+        shutil.copytree(src, dst, dirs_exist_ok=True)
         print(f"Successfully copied {src} to {dst}.")
     except Exception as e:
         print(f"An error occurred while copying: {e}")

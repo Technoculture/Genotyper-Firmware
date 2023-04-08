@@ -1,12 +1,15 @@
-TipRM:
-  name: Tip Resource Manager
-  type: Resorce Manager
-  address: modules/tip_rm
-  description: Tip RM manages tip boxes with various tip sizes in them
+version: 0.0.1
 
-Gantry:
-  name: Gantry Instrument
-  type: Instrument
-  address: modules/instrument
-  description: Gantry instrument allows motion in XZ axis
+content:
+  TipRM:
+    name: Tip Resource Manager
+    type: Resorce Manager
+    address: modules/tip_rm
+    description: Tip RM manages tip boxes with various tip sizes in them
+  
+  Gantry:
+    name: Gantry Instrument
+    type: Instrument
+    address: modules/instrument
+    description: Gantry instrument allows motion in XZ axis
 
