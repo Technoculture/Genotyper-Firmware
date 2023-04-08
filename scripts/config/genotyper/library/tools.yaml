@@ -1,9 +1,9 @@
-- name: No Tool
-  abbr: NoTool
+NoTool:
+  name: No Tool
   description: Represents no tool mounted on the tool change head
 
-- name: Pipette
-  abbr: Pipette
+Pipette:
+  name: Pipette
   description: Pipette allows to pick and drop variable volumes of liquid
   pick_up: NoTool
 
@@ -11,7 +11,6 @@
     - name: 10uL
       abbr: 10 
       preffered_when: The range of liquid to be picked up is between 10 and 100 microliters
-
     - name: 100uL
       abbr: 100
       preffered_when: The range of liquid to be picked up is between 100 and 1000 microliters
