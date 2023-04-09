@@ -1,4 +1,6 @@
+title: Nodes
 version: 0.0.1
+description: ...
 
 content:
   is_tip_available:
@@ -113,7 +115,7 @@ content:
       min_reply: one
       input_variable: active_pipette
     description: There is an error related to to stock / inventory
-  
+
   goto_discard_position:
     type: action
     zenoh:
@@ -121,7 +123,7 @@ content:
         - Gantry
       min_reply: any
     description: There is an error related to to stock / inventory
-  
+
   prepare_to_discard:
     type: action
     zenoh:
@@ -129,7 +131,7 @@ content:
         - TipRM
       min_reply: one
     description: There is an error related to to stock / inventory
-  
+
   eject_tip:
     type: action
     zenoh:

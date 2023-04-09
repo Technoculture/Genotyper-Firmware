@@ -1,0 +1,73 @@
+version: 0.0.1
+endpoint: modules/
+
+content:
+  TipRM:
+    info:
+      name: Tip Resource Manager
+      type: Resorce Manager
+      description: Tip RM manages tip boxes with various tip sizes in them
+    api:
+      endpoint: tip_rm/{ID}/
+      variables:
+        ID: u8
+      paths:
+        count/:
+          get:
+            summary: Respond with the counts of tips as well as tip boxes
+            response:
+              - name: tip_box_capacity
+                type: u8
+                description: ...
+              - name: tip_capacity
+                type: u8
+                description: ...
+              - name: fresh_tip_count
+                type: u16
+                description: ...
+              - name: fresh_tip_box_count
+                type: u8
+                description: ...
+              - name: used_tip_box_count
+                type: u8
+                description: ...
+          book_tip/:
+            post:
+              summary: If tip is available, book a tip for the given sample and do not use use it otherwise
+              parameter:
+                - name: count
+                  type: u4
+                  description: ...
+              response:
+                - name: confirmation
+                  type: bool
+                  description: ...
+          discard_active_tray/:
+            post:
+              summary: ...
+              response:
+                - name: confirmation
+                  type: bool
+                  description: ...
+          load_next_tray/:
+            post:
+              summary: ...
+              response:
+                - name: confirmation
+                  type: bool
+          get_booked_tip/:
+            post:
+              summary: moves the slider of the Tip RM to a location and responds with the location for the gantry to pick up the tip form
+              response:
+                - name: x
+                  type: float
+                - name: z
+                  type: float
+
+  Gantry:
+    info:
+      name: Gantry Instrument
+      type: Instrument
+      description: Gantry instrument allows motion in XZ axis
+    endpoint: modules/instrument
+

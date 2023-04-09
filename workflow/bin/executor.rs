@@ -23,16 +23,21 @@ struct Library {
 #[derive(Debug, Serialize, Deserialize)]
 struct ModuleFile {
     version: String,
+    endpoint: String,
     content: HashMap<String, Module>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Module {
+    info: ModuleInfo,
+    // TODO: add api
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct ModuleInfo {
     name: String,
     #[serde(rename = "type")]
     module_type: String,
-    address: String,
-    description: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -152,9 +157,9 @@ fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn std::error::
 //    }
 //}
 
-fn load_file_modules(path: &str) -> Result<ModuleFile, Box<dyn std::error::Error>> {
+fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn std::error::Error>> {
     // Load the modules
-    let modules_file = File::open(path).unwrap_or_else(|_| panic!("Failed to open module file {}", path));
+    let modules_file = File::open(path).unwrap_or_else(|_| panic!("Failed to open module file {:#?}", path));
     let modules_file_data: ModuleFile =
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
     Version::parse(&modules_file_data.version).expect("Version is not a valid semver version");
@@ -163,7 +168,7 @@ fn load_file_modules(path: &str) -> Result<ModuleFile, Box<dyn std::error::Error
     Ok(modules_file_data)
 }
 
-fn load_file_tools(path: &str) -> Result<ToolFile, Box<dyn std::error::Error>> {
+fn load_file_tools(path: &Path) -> Result<ToolFile, Box<dyn std::error::Error>> {
     // Load the tools
     let tools_file = File::open(path).expect("Unable to open file");
     let tools_file_data: ToolFile =
@@ -174,7 +179,7 @@ fn load_file_tools(path: &str) -> Result<ToolFile, Box<dyn std::error::Error>> {
     Ok(tools_file_data)
 }
 
-fn load_file_nodes(path: &str) -> Result<KnownNodesFile, Box<dyn std::error::Error>> {
+fn load_file_nodes(path: &Path) -> Result<KnownNodesFile, Box<dyn std::error::Error>> {
     // Load the nodes
     let nodes_file = File::open(path).expect("Unable to open file");
     let nodes_file_data: KnownNodesFile =
@@ -218,15 +223,45 @@ fn validate_nodes_library(
     Ok(())
 }
 
+fn name_and_version_from_path(path: &Path) -> (String, Version) {
+    //let path = Path::new(path);
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    let file_name_no_ext = file_name.split(".yaml").collect::<Vec<&str>>()[0].to_string();
+    let name_version = file_name_no_ext.split('-').collect::<Vec<&str>>();
+    if name_version.len() != 2 {
+        panic!("Invalid file name: {}", file_name);
+    }
+    let version = Version::parse(name_version[1]).unwrap();
+    let name = name_version[0].to_string();
+    debug!("{} file found (version {})", name, version);
+    (name, version)
+}
+
+fn list_files_in_dir(path: &Path) -> HashMap<String, (PathBuf, Version)> {
+    let mut files = HashMap::new();
+    for entry in fs::read_dir(path).expect("Failed to read directory") {
+        let entry = entry.expect("Failed to get entry");
+        let path = entry.path();
+        if path.is_file() {
+            let (name, version) = name_and_version_from_path(&path);
+            files.insert(name, (path.to_path_buf(), version));
+        }
+    }
+    files
+}
+
 fn load_library(library_path: &Path) -> Result<Library, Box<dyn std::error::Error>> {
+    let library_list = list_files_in_dir(library_path);
+    trace!("{:#?}", library_list);
+
     // 1. Load the modules file
-    let modules = load_file_modules(library_path.join("modules.yaml").to_str().unwrap())
+    let modules = load_file_modules(&library_list["modules"].0)
         .expect("Failed to load modules");
-    let tools = load_file_tools(library_path.join("tools.yaml").to_str().unwrap())
+    let tools = load_file_tools(&library_list["tools"].0)
         .expect("Failed to load tools");
     let known_dependencies = dependencies_abbr(&modules, &tools);
 
-    let nodes = load_file_nodes(library_path.join("nodes.yaml").to_str().unwrap())
+    let nodes = load_file_nodes(&library_list["nodes"].0)
         .expect("Failed to load nodes");
     validate_nodes_library(&nodes, &known_dependencies).expect("Failed to validate nodes library");
 
@@ -419,14 +454,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ColorChoice::Auto,
     )])
     .unwrap();
-
     // Load the library
     let library_path = library_path().expect("Unable to find library path");
     let library = load_library(&library_path).expect("Failed to load library");
 
     let out = get_workflow_by_title("PCR", &library).expect("Failed to get workflow");
     trace!("{:?}", out);
-
     let out = get_tree_by_name("attempt_pickup_tip", &library).expect("Failed to get tree");
     trace!("{:#?}", out);
 
