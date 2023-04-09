@@ -1,17 +1,23 @@
-use log::info;
+use log::{debug, info, trace};
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use simplelog::*;
 use std::collections::HashMap;
+use std::error::Error;
+use std::fs;
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+
+const DONE: &str = "✅";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Library {
     modules: ModuleFile,
     tools: ToolFile,
     nodes: KnownNodesFile,
+    trees: Vec<BehaviorTreeFile>,
+    workflows: Vec<WorkflowFile>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -108,6 +114,14 @@ struct BehaviorTreeFile {
     tree: Node,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct WorkflowFile {
+    title: String,
+    description: String,
+    version: String,
+    workflow: Vec<String>,
+}
+
 //fn serialize_behaviour_tree(tree: &BehaviorTreeFile, file_name: &str) -> Result<(), Box<dyn std::error::Error>> {
 //    let yaml_string = serde_yaml::to_string(&tree).expect("Failed to serialize tree");
 //    let mut file = File::create(file_name).expect("Failed to create file");
@@ -118,8 +132,15 @@ struct BehaviorTreeFile {
 fn load_a_behaviour_tree(file_name: &str) -> Result<BehaviorTreeFile, Box<dyn std::error::Error>> {
     let file = File::open(file_name).expect("Failed to open file");
     let tree: BehaviorTreeFile = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
-    info!("{:#?}", tree);
+    trace!("{:#?}", tree);
     Ok(tree)
+}
+
+fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn std::error::Error>> {
+    let file = File::open(file_name).expect("Failed to open file");
+    let workflow: WorkflowFile = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
+    trace!("{:#?}", workflow);
+    Ok(workflow)
 }
 
 //fn extract_names(node: &Node, names: &mut Vec<String>) {
@@ -138,7 +159,7 @@ fn load_file_modules(path: &str) -> Result<ModuleFile, Box<dyn std::error::Error
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
     Version::parse(&modules_file_data.version).expect("Version is not a valid semver version");
 
-    info!("Modules file is valid and parsed correctly");
+    info!("{} Modules file is valid", DONE);
     Ok(modules_file_data)
 }
 
@@ -149,7 +170,7 @@ fn load_file_tools(path: &str) -> Result<ToolFile, Box<dyn std::error::Error>> {
         serde_yaml::from_reader(tools_file).expect("Unable to parse tools");
     Version::parse(&tools_file_data.version).expect("Version is not a valid semver version");
 
-    info!("Tools file is valid and parsed correctly");
+    info!("{} Tools file is valid", DONE);
     Ok(tools_file_data)
 }
 
@@ -160,7 +181,7 @@ fn load_file_nodes(path: &str) -> Result<KnownNodesFile, Box<dyn std::error::Err
         serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
     Version::parse(&nodes_file_data.version).expect("Version is not a valid semver version");
 
-    info!("Nodes file is valid and parsed correctly");
+    debug!("Nodes Library file has parsed correctly");
     Ok(nodes_file_data)
 }
 
@@ -173,7 +194,7 @@ fn dependencies_abbr(modules_file_data: &ModuleFile, tools_file_data: &ToolFile)
     for (name, _) in tools_file_data.content.iter() {
         abbrs.push(name.clone());
     }
-    info!("Modules and Tools in Library: {:?}", &abbrs);
+    debug!("Modules and Tools in Library: {:?}", &abbrs);
     abbrs
 }
 
@@ -193,11 +214,12 @@ fn validate_nodes_library(
             }
         }
     }
-    info!("KnownNode Library is valid and ready to be used");
+    info!("{} Node Library is valid", DONE);
     Ok(())
 }
 
 fn load_library(library_path: &PathBuf) -> Result<Library, Box<dyn std::error::Error>> {
+    // 1. Load the modules file
     let modules = load_file_modules(library_path.join("modules.yaml").to_str().unwrap())
         .expect("Failed to load modules");
     let tools = load_file_tools(library_path.join("tools.yaml").to_str().unwrap())
@@ -207,11 +229,48 @@ fn load_library(library_path: &PathBuf) -> Result<Library, Box<dyn std::error::E
     let nodes = load_file_nodes(library_path.join("nodes.yaml").to_str().unwrap())
         .expect("Failed to load nodes");
     validate_nodes_library(&nodes, &known_dependencies).expect("Failed to validate nodes library");
-    Ok(Library {
+
+    let trees = Vec::new();
+    let workflows = Vec::new();
+    let mut library = Library {
         modules,
         tools,
         nodes,
-    })
+        trees,
+        workflows,
+    };
+    // 2. Load the btrees
+    let mut btree_dir_path = library_path.clone();
+    btree_dir_path.push("trees");
+    // 3. Validate all the behavior trees
+    // list all .yaml files in the directory
+    library.trees = validate_dir_library(
+        &btree_dir_path,
+        &library,
+        &load_a_behaviour_tree,
+        &validate_btree,
+    ).expect("Failed to validate behavior trees");
+    info!("{} All behavior trees in the library are valid.", DONE);
+    let tree_names = library
+        .trees
+        .iter()
+        .map(|b| &b.tree.name)
+        .collect::<Vec<&String>>();
+    debug!("List of behavior trees: {:?}", tree_names);
+    // 4. Load the worflows
+    let mut workflow_dir_path = library_path.clone();
+    workflow_dir_path.push("workflows");
+    // 5. Validate all the workflows
+    library.workflows = validate_dir_library(
+        &workflow_dir_path,
+        &library,
+        &load_a_workflow,
+        &validate_workflow,
+    ).expect("Failed to validate workflows");
+    info!("{} All workflows in the library are valid.", DONE);
+
+    info!("{} Library loaded", DONE);
+    Ok(library)
 }
 
 fn validate_btree(
@@ -236,10 +295,7 @@ fn validate_btree(
 
     validate_node(&tree_file.tree, &library).expect("Failed to validate node");
 
-    info!(
-        "Behavior Tree file {} is valid and ready to be used",
-        tree_file.tree.name
-    );
+    debug!("Behavior Tree {} is valid", tree_file.tree.name);
 
     Ok(())
 }
@@ -281,32 +337,91 @@ fn library_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     Ok(home_dir)
 }
 
-fn main() -> Result<(), serde_yaml::Error> {
+fn validate_workflow(
+    workflow_file: &WorkflowFile,
+    library: &Library,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // Check if all nodes are valid
+    let know_trees = library
+        .trees
+        .iter()
+        .map(|b| &b.tree.name)
+        .collect::<Vec<&String>>();
+    debug!("List of trees in the Library: {:?}", &know_trees);
+    for node_name in &workflow_file.workflow {
+        if !know_trees.contains(&node_name) {
+            return Err(format!("Node {} is not a known node", node_name).into());
+        }
+    }
+    debug!("Workflow {} is valid", workflow_file.title);
+    Ok(())
+}
+
+fn validate_dir_library<T>(
+    dir_path: &Path,
+    library: &Library,
+    loader: &dyn Fn(&str) -> Result<T, Box<dyn Error>>,
+    file_validator: &dyn Fn(&T, &Library) -> Result<(), Box<dyn Error>>,
+) -> Result<Vec<T>, Box<dyn Error>> {
+    let mut files = Vec::new();
+    for entry in fs::read_dir(&dir_path).expect("Failed to read directory") {
+        let entry = entry.expect("Failed to read entry");
+        let path = entry.path();
+        if path.extension().unwrap() == "yaml" {
+            // Validate the btree
+            let file = loader(&path.to_str().unwrap()).expect("Failed to deserialize tree");
+            file_validator(&file, &library).expect("Failed to validate tree");
+            files.push(file);
+            trace!("{:?} is valid", &path);
+        }
+    }
+    Ok(files)
+}
+
+fn get_workflow_by_title<'a>(
+    workflow_name: &str,
+    library: &'a Library,
+) -> Result<&'a WorkflowFile, Box<dyn std::error::Error>> {
+    let workflow = library
+        .workflows
+        .iter()
+        .find(|w| w.title == workflow_name)
+        .ok_or(format!("Workflow {} not found", workflow_name))?;
+    Ok(workflow)
+}
+
+fn get_tree_by_name<'a>(
+    tree_file_name: &str,
+    library: &'a Library,
+) -> Result<&'a BehaviorTreeFile, Box<dyn std::error::Error>> {
+    let tree = library
+        .trees
+        .iter()
+        .find(|t| t.tree.name == tree_file_name)
+        .ok_or(format!("Tree {} not found", tree_file_name))?;
+    Ok(tree)
+}
+// --------
+// EXECUTION
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Intiate the logger
     CombinedLogger::init(vec![TermLogger::new(
-        LevelFilter::Trace,
+        LevelFilter::Debug,
         Config::default(),
         TerminalMode::Mixed,
         ColorChoice::Auto,
     )])
     .unwrap();
 
-    // Load the library
+    // 1. Load the library
     let library_path = library_path().expect("Unable to find library path");
     let library = load_library(&library_path).expect("Failed to load library");
 
-    // Load the btree
-    let mut btree_file_path = library_path.clone();
-    btree_file_path.push("trees");
-    btree_file_path.push("attempt_pickup_tip-0.0.1.yaml");
-    let btree_file = load_a_behaviour_tree(btree_file_path.to_str().unwrap())
-        .expect("Failed to deserialize tree");
-    validate_btree(&btree_file, &library).expect("Failed to validate tree");
+    let out = get_workflow_by_title("PCR", &library).expect("Failed to get workflow");
+    debug!("{:?}", out);
 
-    //let mut names = Vec::new();
-    //extract_names(&btree_file.tree, &mut names);
-    //info!("Nodes in Tree File: {:?}", names);
-    info!("btree.yaml is valid and parsed correctly");
+    let out = get_tree_by_name("attempt_pickup_tip", &library).expect("Failed to get tree");
+    debug!("{:?}", out);
 
     Ok(())
 }

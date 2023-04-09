@@ -1,5 +1,8 @@
+title: PCR
+description: ...
+
 version: 0.0.1
 
 workflow:
-  - name: attempt_get_tip
-    version: latest
+  - attempt_pickup_tip
+
