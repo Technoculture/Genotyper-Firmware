@@ -18,3 +18,7 @@ simplelog = "0.12.1"
 [[bin]]
 name = "parse"
 path = "bin/parse.rs"
+
+[[bin]]
+name = "executor"
+path = "bin/executor.rs"

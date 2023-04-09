@@ -6,7 +6,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_any
+      min_reply: any
     description: Checks if a tip is is_tip_available
   
   tip_stock_error:
@@ -18,7 +18,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_any
+      min_reply: any
     description: There is an error related to to stock / inventory
   
   is_discard_success:
@@ -26,7 +26,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   is_discard_tip_successful:
@@ -34,7 +34,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   tray_maintainance_error:
@@ -46,7 +46,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   load_next_tray:
@@ -54,7 +54,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   load_new_tray_maintainance_error:
@@ -66,7 +66,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   move_tip_slider_to_position:
@@ -74,7 +74,7 @@ content:
     zenoh: 
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   is_slider_position_reached:
@@ -82,7 +82,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   is_load_new_tray_successful:
@@ -90,7 +90,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: ...
   
   tray_maintainance_error:
@@ -102,7 +102,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   is_caught_tip_firm_and_gantry:
@@ -110,7 +110,7 @@ content:
     zenoh:
       modules:
         - Pipette
-      min_reply: from_one
+      min_reply: one
       input_variable: active_pipette
     description: There is an error related to to stock / inventory
   
@@ -119,7 +119,7 @@ content:
     zenoh:
       modules:
         - Gantry
-      min_reply: from_any
+      min_reply: any
     description: There is an error related to to stock / inventory
   
   prepare_to_discard:
@@ -127,7 +127,7 @@ content:
     zenoh:
       modules:
         - TipRM
-      min_reply: from_one
+      min_reply: one
     description: There is an error related to to stock / inventory
   
   eject_tip:
@@ -136,6 +136,6 @@ content:
       modules:
         - Pipette
         - TipRM
-      min_reply: from_any
+      min_reply: any
     description: ...
   
