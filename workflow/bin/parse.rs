@@ -124,7 +124,13 @@ struct WorkflowFile {
     title: String,
     description: String,
     version: String,
-    workflow: Vec<String>,
+    workflow: Vec<WorkflowStep>,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct WorkflowStep {
+    name: String,
+    why: String,
 }
 
 //fn serialize_behaviour_tree(tree: &BehaviorTreeFile, file_name: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -159,7 +165,8 @@ fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn std::error::
 
 fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn std::error::Error>> {
     // Load the modules
-    let modules_file = File::open(path).unwrap_or_else(|_| panic!("Failed to open module file {:#?}", path));
+    let modules_file =
+        File::open(path).unwrap_or_else(|_| panic!("Failed to open module file {:#?}", path));
     let modules_file_data: ModuleFile =
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
     Version::parse(&modules_file_data.version).expect("Version is not a valid semver version");
@@ -255,14 +262,11 @@ fn load_library(library_path: &Path) -> Result<Library, Box<dyn std::error::Erro
     trace!("{:#?}", library_list);
 
     // 1. Load the modules file
-    let modules = load_file_modules(&library_list["modules"].0)
-        .expect("Failed to load modules");
-    let tools = load_file_tools(&library_list["tools"].0)
-        .expect("Failed to load tools");
+    let modules = load_file_modules(&library_list["modules"].0).expect("Failed to load modules");
+    let tools = load_file_tools(&library_list["tools"].0).expect("Failed to load tools");
     let known_dependencies = dependencies_abbr(&modules, &tools);
 
-    let nodes = load_file_nodes(&library_list["nodes"].0)
-        .expect("Failed to load nodes");
+    let nodes = load_file_nodes(&library_list["nodes"].0).expect("Failed to load nodes");
     validate_nodes_library(&nodes, &known_dependencies).expect("Failed to validate nodes library");
 
     let trees = Vec::new();
@@ -385,9 +389,9 @@ fn validate_workflow(
         .map(|b| &b.tree.name)
         .collect::<Vec<&String>>();
     debug!("List of trees in the Library: {:?}", &know_trees);
-    for node_name in &workflow_file.workflow {
-        if !know_trees.contains(&node_name) {
-            return Err(format!("Node {} is not a known node", node_name).into());
+    for step in &workflow_file.workflow {
+        if !know_trees.contains(&&step.name) {
+            return Err(format!("Node {} is not a known node", step.name).into());
         }
     }
     debug!("Workflow {} is valid.", workflow_file.title);
@@ -458,7 +462,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let library_path = library_path().expect("Unable to find library path");
     let library = load_library(&library_path).expect("Failed to load library");
 
-    let out = get_workflow_by_title("PCR", &library).expect("Failed to get workflow");
+    let out = get_workflow_by_title("TB PCR", &library).expect("Failed to get workflow");
     trace!("{:?}", out);
     let out = get_tree_by_name("attempt_pickup_tip", &library).expect("Failed to get tree");
     trace!("{:#?}", out);

@@ -1,3 +1,5 @@
+title: ...
+description: ..
 version: 0.0.1
 endpoint: modules/
 
@@ -10,33 +12,35 @@ content:
     api:
       endpoint: tip_rm/{ID}/
       variables:
-        ID: u8
+        ID: uint
       paths:
         count/:
           get:
             summary: Respond with the counts of tips as well as tip boxes
+            timeout: 1s
             response:
               - name: tip_box_capacity
-                type: u8
+                type: uint
                 description: ...
               - name: tip_capacity
-                type: u8
+                type: uint
                 description: ...
               - name: fresh_tip_count
-                type: u16
+                type: uint
                 description: ...
               - name: fresh_tip_box_count
-                type: u8
+                type: uint
                 description: ...
               - name: used_tip_box_count
-                type: u8
+                type: uint
                 description: ...
           book_tip/:
             post:
               summary: If tip is available, book a tip for the given sample and do not use use it otherwise
+              timeout: 1s
               parameter:
                 - name: count
-                  type: u4
+                  type: uint
                   description: ...
               response:
                 - name: confirmation
@@ -45,6 +49,7 @@ content:
           discard_active_tray/:
             post:
               summary: ...
+              timeout: 5m
               response:
                 - name: confirmation
                   type: bool
@@ -52,12 +57,14 @@ content:
           load_next_tray/:
             post:
               summary: ...
+              timeout: 5m
               response:
                 - name: confirmation
                   type: bool
           get_booked_tip/:
             post:
               summary: moves the slider of the Tip RM to a location and responds with the location for the gantry to pick up the tip form
+              timeout: 5m
               response:
                 - name: x
                   type: float
