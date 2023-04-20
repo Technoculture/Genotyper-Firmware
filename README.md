@@ -1,5 +1,9 @@
 # Firmware
 
+Docker Files, Docker Compose Files, Etc.
+1. Dockerfile for a bunch of mock zenoh nodes (Generated form yaml files about for modules), lets use python for such things? Use Makefile/Cargo build.rs or a bash file?
+2. Generate and orchestrate a zoo of mock zenoh modules: Docker Compose? Or Python + Docker SDK?
+
 ```sh
 # Build all subprojects
 cargo build

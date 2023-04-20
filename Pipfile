@@ -17,6 +17,7 @@ textstat = "*"
 transformers = "*"
 google-search-results = "*"
 yaml = "*"
+gitpython = "*"
 
 [dev-packages]
 ipykernel = "*"
