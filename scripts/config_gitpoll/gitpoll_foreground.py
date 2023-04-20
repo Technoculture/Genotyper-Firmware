@@ -2,11 +2,10 @@
 
 import time
 import logging
-from daemonize import Daemonize
 from gitpoll import gitpoll
 
-PID = "/tmp/gitpoll_daemon.pid"
-LOGFILE = "/tmp/gitpoll_daemon.log"
+PID = "/tmp/gitpoll_foreground.pid"
+LOGFILE = "/tmp/gitpoll_foreground.log"
 
 def init_logger():
     logger = logging.getLogger(__name__)
@@ -21,7 +20,7 @@ def init_logger():
     return logger, keep_fds
 
 def main():
-    logger.debug("Starting daemon")
+    logger.debug("Starting foreground process")
     gs = gitpoll.GitPoll()
     while(True):
         gs.poll()
@@ -32,8 +31,5 @@ if __name__ == "__main__":
     logger, keep_fds = init_logger()
 
     logger.debug(f"Logging to {LOGFILE}")
-
-    daemon = Daemonize(app="gitpoll_daemon", pid=PID, action=main, keep_fds=keep_fds, logger=logger)
-    print(f"Run `cat {daemon.pid}` to get the pid of this daemon")
-    daemon.start()
+    main()
 
