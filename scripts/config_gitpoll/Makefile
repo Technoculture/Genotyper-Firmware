@@ -2,8 +2,8 @@ COMPANY=tcr
 PROJ=geno
 NAME=gitpoll
 
-CONTAINER_NAME:=$(PROJ)_$(NAME)_foreground
-IMAGE_NAME:=$(COMPANY)/$(PROJ)_$(NAME)_foreground
+CONTAINER_NAME:=$(COMPANY)/$(PROJ)_$(NAME)_foreground
+IMAGE_NAME:=$(CONTAINER_NAME)
 
 help:
 	@echo "gitpoll: simple git polling daemon"
@@ -28,19 +28,16 @@ start:
 	./$(NAME)_daemon.py
 
 pid:
-	cat /tmp/$(NAME)_daemon.pid
+	cat /tmp/$(COMPANY)/$(NAME)_daemon.pid
 
 logs:
-	tail -f /tmp/$(NAME)_daemon.log
-
-logs:
-	tail -f /tmp/$(NAME)_daemon.log
+	tail -f /tmp/$(COMPANY)/$(NAME)_daemon.log
 
 dlogs:
-	tail -f /tmp/$(NAME)_foreground.log
+	tail -f /tmp/$(COMPANY)/$(NAME)_foreground.log
 
 kill:
-	kill -9 `cat /tmp/$(NAME)_daemon.pid`
+	kill -9 `cat /tmp/$(COMPANY)/$(NAME)_daemon.pid`
 
 test:
 	python $(NAME)/test_$(NAME).py
@@ -48,6 +45,7 @@ test:
 dbuild:
 	docker build -t $(IMAGE_NAME) .
 
-drun:
-	docker run -it -v /tmp:/tmp $(IMAGE_NAME)
+drun: dbuild
+	docker run -it -v /tmp/$(COMPANY):/tmp/$(COMPANY) $(IMAGE_NAME)
 
+.PHONY: help start kill logs test dbuild drun dlogs pid

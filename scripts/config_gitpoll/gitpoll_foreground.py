@@ -4,8 +4,7 @@ import time
 import logging
 from gitpoll import gitpoll
 
-PID = "/tmp/gitpoll_foreground.pid"
-LOGFILE = "/tmp/gitpoll_foreground.log"
+LOGFILE = "/tmp/tcr/gitpoll_foreground.log"
 
 def init_logger():
     logger = logging.getLogger(__name__)

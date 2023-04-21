@@ -15,10 +15,10 @@ def configure_environment() -> str:
     """
     load_dotenv()
     
-    if sys.platform.startswith("darwin") or sys.platform.startswith("win"):
-        tcr_base_dir = os.path.expanduser('~/tcr')
+    if sys.platform.startswith("win"):
+        tcr_base_dir = os.path.expanduser('~/tmp/tcr')
     else:
-        tcr_base_dir = '/var/tcr'
+        tcr_base_dir = '/tmp/tcr'
     
     os.makedirs(tcr_base_dir, exist_ok=True)
     return tcr_base_dir
@@ -86,9 +86,7 @@ if __name__ == "__main__":
     """Main function to run the script."""
 
     git_sync = GitPoll()
-    while True:
-        print('Syncing Git repository with local folder...')
-        git_sync.poll()
-        print('Syncing complete.')
-        print(git_sync)
-        time.sleep(60)
+    print('Syncing Git repository with local folder...')
+    git_sync.poll()
+    print('Syncing complete.')
+    print(git_sync)

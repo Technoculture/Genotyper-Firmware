@@ -5,8 +5,8 @@ import logging
 from daemonize import Daemonize
 from gitpoll import gitpoll
 
-PID = "/tmp/gitpoll_daemon.pid"
-LOGFILE = "/tmp/gitpoll_daemon.log"
+PID = "/tmp/tcr/gitpoll_daemon.pid"
+LOGFILE = "/tmp/tcr/gitpoll_daemon.log"
 
 def init_logger():
     logger = logging.getLogger(__name__)

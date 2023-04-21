@@ -1,52 +1,93 @@
 use log::{debug, info, trace};
 use semver::Version;
 use serde::{Deserialize, Serialize};
+use schemars::{schema_for, JsonSchema};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::path::{Path, PathBuf};
+use std::io::Write;
 
 const DONE: &str = "→ ✅";
 const OK: &str = "↓ ✔️";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Library {
-    modules: ModuleFile,
-    tools: ToolFile,
-    nodes: KnownNodesFile,
-    trees: Vec<BehaviorTreeFile>,
-    workflows: Vec<WorkflowFile>,
+    pub modules: ModuleFile,
+    pub tools: ToolFile,
+    pub nodes: KnownNodesFile,
+    pub trees: Vec<BehaviorTreeFile>,
+    pub workflows: Vec<WorkflowFile>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct ModuleFile {
-    version: String,
-    endpoint: String,
-    content: HashMap<String, Module>,
+#[derive(Debug, Serialize, JsonSchema, Deserialize)]
+pub struct ModuleFile {
+    pub version: String,
+    pub endpoint: String,
+    pub content: HashMap<String, Module>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Module {
-    info: ModuleInfo,
-    // TODO: add api
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct Module {
+    pub info: ModuleInfo,
+    pub api: API,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct ModuleInfo {
-    name: String,
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct ModuleInfo {
+    pub name: String,
     #[serde(rename = "type")]
-    module_type: String,
+    pub module_type: String,
+    pub description: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct ToolFile {
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct API {
+    pub endpoint: String,
+    pub variables: HashMap<String, String>, // TODO: Later <String, data_type>
+    pub services: HashMap<String, Service>, // TODO Later <<path>/, Service>
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct Service(HashMap<RequestType, RequestSchema>);
+
+#[derive(Debug, Hash, PartialEq, Eq, Serialize, JsonSchema, Deserialize)]
+pub enum RequestType {
+    #[serde(rename = "get")]
+    GET,
+    #[serde(rename = "post")]
+    POST,
+    #[serde(rename = "put")]
+    PUT,
+    #[serde(rename = "delete")]
+    DELETE,
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct RequestSchema {
+    pub summary: String,
+    pub timeout: String, // TODO: Parse to Duration
+    pub parameters: Option<Vec<ValueSchema>>,
+    pub response: Option<Vec<ValueSchema>>,
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct ValueSchema {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub data_type: String, // TODO: Parse to DataType
+    pub description: String,
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct ToolFile {
     version: String,
     content: HashMap<String, Tool>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Tool {
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct Tool {
     name: String,
     description: String,
     //#[serde(default)]
@@ -55,14 +96,14 @@ struct Tool {
     variants: Option<Vec<Variant>>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 struct Variant {
     name: String,
     description: Option<String>,
     preffered_when: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum NodeType {
     Condition,
@@ -71,13 +112,13 @@ enum NodeType {
     Error,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct KnownNodesFile {
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub struct KnownNodesFile {
     version: String,
     content: HashMap<String, KnownNode>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 struct KnownNode {
     #[serde(rename = "type")]
     node_type: NodeType,
@@ -86,7 +127,7 @@ struct KnownNode {
     description: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum ReplyMode {
     Any,
@@ -94,13 +135,13 @@ enum ReplyMode {
     One,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 struct Zenoh {
     modules: Vec<String>,
     min_reply: ReplyMode,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 struct Node {
     name: String,
     error: Option<String>,
@@ -108,7 +149,7 @@ struct Node {
     fallback: Option<Vec<Node>>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub struct BehaviorTreeFile {
     title: String,
     version: String,
@@ -118,7 +159,7 @@ pub struct BehaviorTreeFile {
     tree: Node,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub struct WorkflowFile {
     title: String,
     description: String,
@@ -126,27 +167,27 @@ pub struct WorkflowFile {
     workflow: Vec<WorkflowStep>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 struct WorkflowStep {
     name: String,
     why: String,
 }
 
-//fn serialize_behaviour_tree(tree: &BehaviorTreeFile, file_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+//fn serialize_behaviour_tree(tree: &BehaviorTreeFile, file_name: &str) -> Result<(), Box<dyn Error>> {
 //    let yaml_string = serde_yaml::to_string(&tree).expect("Failed to serialize tree");
 //    let mut file = File::create(file_name).expect("Failed to create file");
 //    file.write_all(yaml_string.as_bytes()).expect("Failed to write to file");
 //    Ok(())
 //}
 
-fn load_a_behaviour_tree(file_name: &str) -> Result<BehaviorTreeFile, Box<dyn std::error::Error>> {
+fn load_a_behaviour_tree(file_name: &str) -> Result<BehaviorTreeFile, Box<dyn Error>> {
     let file = File::open(file_name).expect("Failed to open file");
     let tree: BehaviorTreeFile = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
     trace!("{:#?}", tree);
     Ok(tree)
 }
 
-fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn std::error::Error>> {
+fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn Error>> {
     let file = File::open(file_name).expect("Failed to open file");
     let workflow: WorkflowFile = serde_yaml::from_reader(file).expect("Failed to deserialize tree");
     trace!("{:#?}", workflow);
@@ -162,7 +203,7 @@ fn load_a_workflow(file_name: &str) -> Result<WorkflowFile, Box<dyn std::error::
 //    }
 //}
 
-fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn std::error::Error>> {
+fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn Error>> {
     // Load the modules
     let modules_file =
         File::open(path).unwrap_or_else(|_| panic!("Failed to open module file {:#?}", path));
@@ -174,7 +215,7 @@ fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn std::error::Erro
     Ok(modules_file_data)
 }
 
-fn load_file_tools(path: &Path) -> Result<ToolFile, Box<dyn std::error::Error>> {
+fn load_file_tools(path: &Path) -> Result<ToolFile, Box<dyn Error>> {
     // Load the tools
     let tools_file = File::open(path).expect("Unable to open file");
     let tools_file_data: ToolFile =
@@ -185,7 +226,7 @@ fn load_file_tools(path: &Path) -> Result<ToolFile, Box<dyn std::error::Error>> 
     Ok(tools_file_data)
 }
 
-fn load_file_nodes(path: &Path) -> Result<KnownNodesFile, Box<dyn std::error::Error>> {
+fn load_file_nodes(path: &Path) -> Result<KnownNodesFile, Box<dyn Error>> {
     // Load the nodes
     let nodes_file = File::open(path).expect("Unable to open file");
     let nodes_file_data: KnownNodesFile =
@@ -213,7 +254,7 @@ fn dependencies_abbr(modules_file_data: &ModuleFile, tools_file_data: &ToolFile)
 fn validate_nodes_library(
     nodes_file_data: &KnownNodesFile,
     known_dependencies: &[String],
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn Error>> {
     // Throw an error if a node is using a module that is not known
     for (name, node) in nodes_file_data.content.iter() {
         if let Some(zenoh) = &node.zenoh {
@@ -257,7 +298,7 @@ fn list_files_in_dir(path: &Path) -> HashMap<String, (PathBuf, Version)> {
     files
 }
 
-pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn std::error::Error>> {
+pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn Error>> {
     let library_list = list_files_in_dir(library_path);
     trace!("{:#?}", library_list);
 
@@ -317,7 +358,7 @@ pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn std::error::
 fn validate_btree(
     tree_file: &BehaviorTreeFile,
     library: &Library,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn Error>> {
     // Check if btree name is not a known node
     if library.nodes.content.contains_key(&tree_file.tree.name) {
         return Err(format!(
@@ -341,7 +382,7 @@ fn validate_btree(
     Ok(())
 }
 
-fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn std::error::Error>> {
+fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn Error>> {
     // Check if the tree is valid
     // 1. If the node has children, check if they are valid
     //  a. If a node has no children, check if it is a known node
@@ -371,17 +412,35 @@ fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn std::erro
     Ok(())
 }
 
-pub fn home_library_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
-    let mut home_dir = dirs::home_dir().expect("Unable to find home directory");
-    home_dir.push("tcr");
-    home_dir.push("library");
-    Ok(home_dir)
+pub fn root_library_path() -> Result<PathBuf, Box<dyn Error>> {
+    let root_dir = if cfg!(windows) {
+        Path::new("C:\\")
+    } else {
+        Path::new("/")
+    };
+
+    let mut library_path = PathBuf::from(root_dir);
+    library_path.push("tmp");
+    library_path.push("tcr");
+    library_path.push("genodatalib");
+    library_path.push("library");
+
+    Ok(library_path)
 }
+
+// fn home_library_path() -> Result<PathBuf, Box<dyn Error>> {
+//    let mut home_dir = dirs::home_dir().expect("Unable to find home directory");
+//    home_dir.push("tmp");
+//    home_dir.push("tcr");
+//    home_dir.push("genodatalib");
+//    home_dir.push("library");
+//    Ok(home_dir)
+//}
 
 fn validate_workflow(
     workflow_file: &WorkflowFile,
     library: &Library,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn Error>> {
     // Check if all nodes are valid
     let know_trees = library
         .trees
@@ -425,7 +484,7 @@ fn validate_dir_library<T>(
 pub fn get_workflow_by_title<'a>(
     workflow_name: &str,
     library: &'a Library,
-) -> Result<&'a WorkflowFile, Box<dyn std::error::Error>> {
+) -> Result<&'a WorkflowFile, Box<dyn Error>> {
     let workflow = library
         .workflows
         .iter()
@@ -437,11 +496,26 @@ pub fn get_workflow_by_title<'a>(
 pub fn get_tree_by_name<'a>(
     tree_file_name: &str,
     library: &'a Library,
-) -> Result<&'a BehaviorTreeFile, Box<dyn std::error::Error>> {
+) -> Result<&'a BehaviorTreeFile, Box<dyn Error>> {
     let tree = library
         .trees
         .iter()
         .find(|t| t.tree.name == tree_file_name)
         .ok_or(format!("Tree {} not found", tree_file_name))?;
     Ok(tree)
+}
+
+pub fn generate_json_schemas() -> Result<(), Box<dyn Error>> {
+    let mut schema_path = root_library_path()?;
+    schema_path.push("schema");
+    // Create the schema json files for each, modules, nodes, trees, worflows, etc.
+    let module_file_schema = schema_for!(ModuleFile);
+    // Write this file to root_dir/schema/modules_schema.json
+    let mut module_file_schema_path = schema_path.clone();
+    module_file_schema_path.push("modules_schema.json");
+
+    let mut module_file_schema_file = File::create(module_file_schema_path)?;
+    module_file_schema_file.write_all(serde_json::to_string_pretty(&module_file_schema).unwrap().as_bytes())?;
+
+    Ok(())
 }

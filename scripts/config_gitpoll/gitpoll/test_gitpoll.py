@@ -38,6 +38,23 @@ def test_git_poll_repr():
     repr_string = git_poll.__repr__()
     assert isinstance(repr_string, str) == True
 
+def script_runs_without_errors():
+    git_poll = GitPoll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+    git_poll.poll()
+
 if __name__ == "__main__":
     print("Running test_sync.py")
     test_configure_environment()

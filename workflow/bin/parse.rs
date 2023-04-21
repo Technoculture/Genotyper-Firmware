@@ -1,6 +1,6 @@
-use workflow::conf::{get_tree_by_name, get_workflow_by_title, home_library_path, load_library};
 use clap::Parser;
 use std::path::PathBuf;
+use workflow::conf::{get_tree_by_name, get_workflow_by_title, load_library, root_library_path};
 
 use log::{info, trace};
 use simplelog::*;
@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load the library
     let library_path = match args.library_path {
         Some(path) => PathBuf::new().join(path),
-        None => home_library_path().expect("Unable to find library path")
+        None => root_library_path().expect("Unable to find library path"),
     };
     let library = load_library(&library_path).expect("Failed to load library");
 
