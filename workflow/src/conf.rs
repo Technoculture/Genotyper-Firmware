@@ -1,18 +1,23 @@
-use log::{debug, info, trace};
+use log::{debug, trace};
+use schemars::{schema_for, JsonSchema};
 use semver::Version;
 use serde::{Deserialize, Serialize};
-use schemars::{schema_for, JsonSchema};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::fs::File;
-use std::path::{Path, PathBuf};
 use std::io::Write;
+use std::path::{Path, PathBuf};
 
 const DONE: &str = "→ ✅";
 const OK: &str = "↓ ✔️";
 
+#[derive(Debug, Serialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Endpoint(String);
+
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Library {
     pub modules: ModuleFile,
     pub tools: ToolFile,
@@ -22,19 +27,24 @@ pub struct Library {
 }
 
 #[derive(Debug, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModuleFile {
+    title: String,
+    description: String,
     pub version: String,
     pub endpoint: String,
     pub content: HashMap<String, Module>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Module {
     pub info: ModuleInfo,
     pub api: API,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ModuleInfo {
     pub name: String,
     #[serde(rename = "type")]
@@ -43,16 +53,19 @@ pub struct ModuleInfo {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct API {
     pub endpoint: String,
-    pub variables: HashMap<String, String>, // TODO: Later <String, data_type>
-    pub services: HashMap<String, Service>, // TODO Later <<path>/, Service>
+    pub variables: Option<HashMap<String, String>>, // TODO: Later <String, data_type>
+    pub services: HashMap<String, Service>,         // TODO Later <<path>/, Service>
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Service(HashMap<RequestType, RequestSchema>);
 
 #[derive(Debug, Hash, PartialEq, Eq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum RequestType {
     #[serde(rename = "get")]
     GET,
@@ -65,6 +78,7 @@ pub enum RequestType {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RequestSchema {
     pub summary: String,
     pub timeout: String, // TODO: Parse to Duration
@@ -73,37 +87,66 @@ pub struct RequestSchema {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+pub enum Unit {
+    #[serde(rename = "C")]
+    CELSIUS,
+    // Time
+    #[serde(rename = "ms")]
+    MILISECONDS,
+    #[serde(rename = "s")]
+    SECONDS,
+    #[serde(rename = "m")]
+    MINUTES,
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValueSchema {
     pub name: String,
     #[serde(rename = "type")]
     pub data_type: String, // TODO: Parse to DataType
     pub description: String,
+    pub unit: Option<Unit>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Value {
+    #[serde(flatten)]
+    pub schema: ValueSchema,
+    pub value: f64,
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ToolFile {
-    version: String,
-    content: HashMap<String, Tool>,
+    pub name: String,
+    pub version: String,
+    pub content: HashMap<String, Tool>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Tool {
-    name: String,
-    description: String,
+    pub name: String,
+    pub description: String,
     //#[serde(default)]
-    pick_up: Option<String>,
+    pub pick_up: Option<String>,
     //#[serde(default)]
-    variants: Option<Vec<Variant>>,
+    pub variants: Option<Vec<Variant>>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
-struct Variant {
-    name: String,
-    description: Option<String>,
-    preffered_when: String,
+#[serde(deny_unknown_fields)]
+pub struct Variant {
+    pub name: String,
+    pub description: Option<String>,
+    pub abbr: String,
+    pub preffered_when: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeType {
     Condition,
@@ -113,12 +156,16 @@ pub enum NodeType {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct KnownNodesFile {
+    pub title: String,
+    pub description: String,
     pub version: String,
     pub content: HashMap<String, KnownNode>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct KnownNode {
     #[serde(rename = "type")]
     pub node_type: NodeType,
@@ -128,6 +175,7 @@ pub struct KnownNode {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 pub enum ReplyMode {
     Any,
@@ -136,12 +184,14 @@ pub enum ReplyMode {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Zenoh {
     pub modules: Vec<String>,
     pub min_reply: ReplyMode,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Node {
     pub name: String,
     pub error: Option<String>,
@@ -150,6 +200,7 @@ pub struct Node {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BehaviorTreeFile {
     pub title: String,
     pub version: String,
@@ -160,14 +211,18 @@ pub struct BehaviorTreeFile {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WorkflowFile {
     pub title: String,
     pub description: String,
     pub version: String,
     pub workflow: Vec<WorkflowStep>,
+    pub parameters: Vec<Value>,
+    pub process_tldr: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WorkflowStep {
     pub name: String,
     pub why: String,
@@ -211,7 +266,7 @@ fn load_file_modules(path: &Path) -> Result<ModuleFile, Box<dyn Error>> {
         serde_yaml::from_reader(modules_file).expect("Unable to parse modules");
     Version::parse(&modules_file_data.version).expect("Version is not a valid semver version");
 
-    info!("{} All Modules in the modules file are valid.", OK);
+    debug!("{} All Modules in the modules file are valid.", OK);
     Ok(modules_file_data)
 }
 
@@ -222,7 +277,7 @@ fn load_file_tools(path: &Path) -> Result<ToolFile, Box<dyn Error>> {
         serde_yaml::from_reader(tools_file).expect("Unable to parse tools");
     Version::parse(&tools_file_data.version).expect("Version is not a valid semver version");
 
-    info!("{} All Tools in the tools file are valid.", OK);
+    debug!("{} All Tools in the tools file are valid.", OK);
     Ok(tools_file_data)
 }
 
@@ -233,7 +288,7 @@ fn load_file_nodes(path: &Path) -> Result<KnownNodesFile, Box<dyn Error>> {
         serde_yaml::from_reader(nodes_file).expect("Unable to parse nodes");
     Version::parse(&nodes_file_data.version).expect("Version is not a valid semver version");
 
-    debug!("Nodes Library file has parsed correctly");
+    trace!("Nodes Library file has parsed correctly");
     Ok(nodes_file_data)
 }
 
@@ -246,7 +301,7 @@ fn dependencies_abbr(modules_file_data: &ModuleFile, tools_file_data: &ToolFile)
     for (name, _) in tools_file_data.content.iter() {
         abbrs.push(name.clone());
     }
-    debug!("Modules and Tools in Library: {:?}", &abbrs);
+    trace!("Modules and Tools in Library: {:?}", &abbrs);
     abbrs
 }
 
@@ -267,7 +322,7 @@ fn validate_nodes_library(
             }
         }
     }
-    info!("{} All Nodes in the nodes file are valid.", OK);
+    debug!("{} All Nodes in the nodes file are valid.", OK);
     Ok(())
 }
 
@@ -281,7 +336,7 @@ fn name_and_version_from_path(path: &Path) -> (String, Version) {
     }
     let version = Version::parse(name_version[1]).unwrap();
     let name = name_version[0].to_string();
-    debug!("{} file found (version {})", name, version);
+    trace!("{} file found (version {})", name, version);
     (name, version)
 }
 
@@ -331,13 +386,13 @@ pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn Error>> {
         validate_btree,
     )
     .expect("Failed to validate behavior trees");
-    info!("{} All behavior trees in the library are valid.", OK);
+    debug!("{} All behavior trees in the library are valid.", OK);
     let tree_names = library
         .trees
         .iter()
         .map(|b| &b.tree.name)
         .collect::<Vec<&String>>();
-    debug!("List of behavior trees: {:?}", tree_names);
+    trace!("List of behavior trees: {:?}", tree_names);
     // 4. Load the worflows
     let mut workflow_dir_path = library_path.to_path_buf();
     workflow_dir_path.push("workflows");
@@ -349,16 +404,13 @@ pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn Error>> {
         validate_workflow,
     )
     .expect("Failed to validate workflows");
-    info!("{} All workflows in the library are valid.", OK);
+    debug!("{} All workflows in the library are valid.", OK);
 
-    info!("{} Library loading and validation complete.", DONE);
+    debug!("{} Library loading and validation complete.", DONE);
     Ok(library)
 }
 
-fn validate_btree(
-    tree_file: &BehaviorTreeFile,
-    library: &Library,
-) -> Result<(), Box<dyn Error>> {
+fn validate_btree(tree_file: &BehaviorTreeFile, library: &Library) -> Result<(), Box<dyn Error>> {
     // Check if btree name is not a known node
     if library.nodes.content.contains_key(&tree_file.tree.name) {
         return Err(format!(
@@ -377,7 +429,7 @@ fn validate_btree(
 
     validate_node(&tree_file.tree, library).expect("Failed to validate node");
 
-    debug!("Behavior Tree {} is valid.", tree_file.tree.name);
+    trace!("Behavior Tree {} is valid.", tree_file.tree.name);
 
     Ok(())
 }
@@ -447,13 +499,13 @@ fn validate_workflow(
         .iter()
         .map(|b| &b.tree.name)
         .collect::<Vec<&String>>();
-    debug!("List of trees in the Library: {:?}", &know_trees);
+    trace!("List of trees in the Library: {:?}", &know_trees);
     for step in &workflow_file.workflow {
         if !know_trees.contains(&&step.name) {
             return Err(format!("Node {} is not a known node", step.name).into());
         }
     }
-    debug!("Workflow {} is valid.", workflow_file.title);
+    trace!("Workflow {} is valid.", workflow_file.title);
     Ok(())
 }
 
@@ -505,14 +557,21 @@ pub fn get_tree_by_name<'a>(
     Ok(tree)
 }
 
-pub fn file_type_to_schema<T: JsonSchema>(name: String, schema_path: PathBuf) -> Result<(), Box<dyn Error>> {
+pub fn file_type_to_schema<T: JsonSchema>(
+    name: String,
+    schema_path: PathBuf,
+) -> Result<(), Box<dyn Error>> {
     let file_schema = schema_for!(T);
     // Write this file to root_dir/schema/modules_schema.json
     let mut file_schema_path = schema_path.clone();
     file_schema_path.push(format!("{}_schema.json", name));
 
     let mut file_schema_file = File::create(file_schema_path)?;
-    file_schema_file.write_all(serde_json::to_string_pretty(&file_schema).unwrap().as_bytes())?;
+    file_schema_file.write_all(
+        serde_json::to_string_pretty(&file_schema)
+            .unwrap()
+            .as_bytes(),
+    )?;
 
     Ok(())
 }
@@ -527,6 +586,6 @@ pub fn generate_json_schemas() -> Result<(), Box<dyn Error>> {
     file_type_to_schema::<BehaviorTreeFile>("trees".to_string(), schema_path.clone())?;
     file_type_to_schema::<WorkflowFile>("workflows".to_string(), schema_path.clone())?;
     file_type_to_schema::<ToolFile>("tools".to_string(), schema_path.clone())?;
-    
+
     Ok(())
 }

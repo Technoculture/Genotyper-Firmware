@@ -30,3 +30,7 @@ path = "bin/parse.rs"
 [[bin]]
 name = "schemagen"
 path = "bin/schemagen.rs"
+
+[[bin]]
+name = "executor"
+path = "bin/executor.rs"
