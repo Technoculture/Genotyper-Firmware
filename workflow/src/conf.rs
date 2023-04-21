@@ -105,7 +105,7 @@ struct Variant {
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum NodeType {
+pub enum NodeType {
     Condition,
     Action,
     Sequence,
@@ -114,63 +114,63 @@ enum NodeType {
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub struct KnownNodesFile {
-    version: String,
-    content: HashMap<String, KnownNode>,
+    pub version: String,
+    pub content: HashMap<String, KnownNode>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
-struct KnownNode {
+pub struct KnownNode {
     #[serde(rename = "type")]
-    node_type: NodeType,
+    pub node_type: NodeType,
     #[serde(default)]
-    zenoh: Option<Zenoh>,
-    description: String,
+    pub zenoh: Option<Zenoh>,
+    pub description: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum ReplyMode {
+pub enum ReplyMode {
     Any,
     All,
     One,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
-struct Zenoh {
-    modules: Vec<String>,
-    min_reply: ReplyMode,
+pub struct Zenoh {
+    pub modules: Vec<String>,
+    pub min_reply: ReplyMode,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
-struct Node {
-    name: String,
-    error: Option<String>,
-    children: Option<Vec<Node>>,
-    fallback: Option<Vec<Node>>,
+pub struct Node {
+    pub name: String,
+    pub error: Option<String>,
+    pub children: Option<Vec<Node>>,
+    pub fallback: Option<Vec<Node>>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub struct BehaviorTreeFile {
-    title: String,
-    version: String,
-    description: String,
+    pub title: String,
+    pub version: String,
+    pub description: String,
     #[serde(rename = "participant_modules")]
-    participants: Vec<String>,
-    tree: Node,
+    pub participants: Vec<String>,
+    pub tree: Node,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub struct WorkflowFile {
-    title: String,
-    description: String,
-    version: String,
-    workflow: Vec<WorkflowStep>,
+    pub title: String,
+    pub description: String,
+    pub version: String,
+    pub workflow: Vec<WorkflowStep>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
-struct WorkflowStep {
-    name: String,
-    why: String,
+pub struct WorkflowStep {
+    pub name: String,
+    pub why: String,
 }
 
 //fn serialize_behaviour_tree(tree: &BehaviorTreeFile, file_name: &str) -> Result<(), Box<dyn Error>> {
@@ -505,17 +505,28 @@ pub fn get_tree_by_name<'a>(
     Ok(tree)
 }
 
+pub fn file_type_to_schema<T: JsonSchema>(name: String, schema_path: PathBuf) -> Result<(), Box<dyn Error>> {
+    let file_schema = schema_for!(T);
+    // Write this file to root_dir/schema/modules_schema.json
+    let mut file_schema_path = schema_path.clone();
+    file_schema_path.push(format!("{}_schema.json", name));
+
+    let mut file_schema_file = File::create(file_schema_path)?;
+    file_schema_file.write_all(serde_json::to_string_pretty(&file_schema).unwrap().as_bytes())?;
+
+    Ok(())
+}
+
 pub fn generate_json_schemas() -> Result<(), Box<dyn Error>> {
     let mut schema_path = root_library_path()?;
     schema_path.push("schema");
+
     // Create the schema json files for each, modules, nodes, trees, worflows, etc.
-    let module_file_schema = schema_for!(ModuleFile);
-    // Write this file to root_dir/schema/modules_schema.json
-    let mut module_file_schema_path = schema_path.clone();
-    module_file_schema_path.push("modules_schema.json");
-
-    let mut module_file_schema_file = File::create(module_file_schema_path)?;
-    module_file_schema_file.write_all(serde_json::to_string_pretty(&module_file_schema).unwrap().as_bytes())?;
-
+    file_type_to_schema::<ModuleFile>("modules".to_string(), schema_path.clone())?;
+    file_type_to_schema::<KnownNodesFile>("nodes".to_string(), schema_path.clone())?;
+    file_type_to_schema::<BehaviorTreeFile>("trees".to_string(), schema_path.clone())?;
+    file_type_to_schema::<WorkflowFile>("workflows".to_string(), schema_path.clone())?;
+    file_type_to_schema::<ToolFile>("tools".to_string(), schema_path.clone())?;
+    
     Ok(())
 }
