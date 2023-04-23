@@ -28,12 +28,16 @@ fn main() {
 
     // 1. Get the list of modules and their APIs
     let modules = library.modules;
-    for module in modules.content {
-        let api = &module.api;
-        println!("API for module {}: {:#?}", module.info.name, api);
+    for (module_name, module) in modules.content {
+        println!("Module: {}", module_name);
+        let api = module.api;
+        for (service_name, service) in api.services {
+            println!("Service: {}\n{:#?}", service_name, service);
+        }
     }
 
     // 2. For every service in the API spec, create a mock service
 
     // 3. Start all the mock services in seperate processes
 }
+
