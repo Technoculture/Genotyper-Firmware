@@ -1,6 +1,6 @@
 use clap::Parser;
 use workflow::conf::{
-    get_tree_by_name, load_library, root_library_path, BehaviorTreeFile, Library,
+    get_tree_by_name, load_library, root_library_path, BehaviorTreeFile, Library, Node
 };
 
 use log::{debug, trace, info};
@@ -21,12 +21,27 @@ struct Args {
     tree_name: String,
 }
 
+//pub fn execute_node(node: &Node, library: &Library) -> Result<(), Box<dyn Error>> {
+//    // Execute the current node
+//    info!("Executing node: '{}'", node.name);
+//
+//    // TODO: Implement the actual node execution logic here
+//
+//    // Recursively execute child nodes
+//    for child in &node.children {
+//        execute_node(child, library)?;
+//    }
+//
+//    Ok(())
+//}
+
 pub fn execute_tree(tree: &BehaviorTreeFile, library: &Library) -> Result<(), Box<dyn Error>> {
     // println!("{:#?}", &tree);
     info!("Starting execution of a tree: '{}' ({})", tree.title, tree.description);
 
     // TODO: Traverse through the tree and execute the nodes
     // Traverse in a root-first manner
+
 
     Ok(())
 }

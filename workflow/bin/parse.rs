@@ -18,7 +18,7 @@ struct Args {
     workflow_name: String,
 
     /// The name of the tree to run
-    #[arg(short, long, default_value = "attempt_pickup_tip")]
+    #[arg(short, long, default_value = "get_tip")]
     // tree_name: Option<String>,
     tree_name: String,
 }

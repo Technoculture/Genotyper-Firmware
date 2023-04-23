@@ -1,4 +1,4 @@
-use log::{debug, trace};
+use log::{debug, trace, info};
 use schemars::{schema_for, JsonSchema};
 use semver::Version;
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,7 @@ pub struct Library {
 #[derive(Debug, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModuleFile {
+    file_name: Option<String>,
     title: String,
     description: String,
     pub version: String,
@@ -120,6 +121,7 @@ pub struct Value {
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ToolFile {
+    file_name: Option<String>,
     pub name: String,
     pub version: String,
     pub content: HashMap<String, Tool>,
@@ -158,6 +160,7 @@ pub enum NodeType {
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KnownNodesFile {
+    file_name: Option<String>,
     pub title: String,
     pub description: String,
     pub version: String,
@@ -191,17 +194,25 @@ pub struct Zenoh {
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum Sequence {
+    Children(Vec<Node>), // HAS
+    Fallback(Vec<Node>), // HAS
+}
+
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Node {
     pub name: String,
+    pub step_number: u8,
+    pub sequence: Option<Sequence>,
     pub error: Option<String>,
-    pub children: Option<Vec<Node>>,
-    pub fallback: Option<Vec<Node>>,
 }
 
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BehaviorTreeFile {
+    file_name: Option<String>,
     pub title: String,
     pub version: String,
     pub description: String,
@@ -213,6 +224,7 @@ pub struct BehaviorTreeFile {
 #[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WorkflowFile {
+    file_name: Option<String>,
     pub title: String,
     pub description: String,
     pub version: String,
@@ -326,30 +338,34 @@ fn validate_nodes_library(
     Ok(())
 }
 
-fn name_and_version_from_path(path: &Path) -> (String, Version) {
-    //let path = Path::new(path);
+fn name_from_path(path: &Path) -> String {
     let file_name = path.file_name().unwrap().to_str().unwrap();
-    let file_name_no_ext = file_name.split(".yaml").collect::<Vec<&str>>()[0].to_string();
-    let name_version = file_name_no_ext.split('-').collect::<Vec<&str>>();
-    if name_version.len() != 2 {
-        panic!("Invalid file name: {}", file_name);
-    }
-    let version = Version::parse(name_version[1]).unwrap();
-    let name = name_version[0].to_string();
-    trace!("{} file found (version {})", name, version);
-    (name, version)
+    //println!("file_name: {:#?}", file_name.clone().split(".yaml"));
+    let file_name_no_ext = file_name.split(".yaml")
+        .next()
+        .expect(format!("Invalid file name: {}", file_name).as_str());
+    trace!("{} file found.", file_name_no_ext);
+
+    let file_name_no_prefix = file_name_no_ext.split(".").next().expect(
+        format!("Invalid file name: {}", file_name_no_ext).as_str(),
+    );
+
+    trace!("file_name_no_prefix: {:#?}", file_name_no_prefix);
+
+    file_name_no_prefix.to_string()
 }
 
-fn list_files_in_dir(path: &Path) -> HashMap<String, (PathBuf, Version)> {
+fn list_files_in_dir(path: &Path) -> HashMap<String, PathBuf> {
     let mut files = HashMap::new();
     for entry in fs::read_dir(path).expect("Failed to read directory") {
         let entry = entry.expect("Failed to get entry");
         let path = entry.path();
         if path.is_file() {
-            let (name, version) = name_and_version_from_path(&path);
-            files.insert(name, (path.to_path_buf(), version));
+            let name = name_from_path(&path);
+            files.insert(name, path.to_path_buf());
         }
     }
+    trace!("{:#?} files found.", files);
     files
 }
 
@@ -358,11 +374,11 @@ pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn Error>> {
     trace!("{:#?}", library_list);
 
     // 1. Load the modules file
-    let modules = load_file_modules(&library_list["modules"].0).expect("Failed to load modules");
-    let tools = load_file_tools(&library_list["tools"].0).expect("Failed to load tools");
+    let modules = load_file_modules(&library_list["modules"]).expect("Failed to load modules");
+    let tools = load_file_tools(&library_list["tools"]).expect("Failed to load tools");
     let known_dependencies = dependencies_abbr(&modules, &tools);
 
-    let nodes = load_file_nodes(&library_list["nodes"].0).expect("Failed to load nodes");
+    let nodes = load_file_nodes(&library_list["nodes"]).expect("Failed to load nodes");
     validate_nodes_library(&nodes, &known_dependencies).expect("Failed to validate nodes library");
 
     let trees = Vec::new();
@@ -419,7 +435,6 @@ fn validate_btree(tree_file: &BehaviorTreeFile, library: &Library) -> Result<(),
         )
         .into());
     }
-
     // Check if participants are known
     for participant in &tree_file.participants {
         if !library.modules.content.contains_key(participant) {
@@ -428,9 +443,7 @@ fn validate_btree(tree_file: &BehaviorTreeFile, library: &Library) -> Result<(),
     }
 
     validate_node(&tree_file.tree, library).expect("Failed to validate node");
-
     trace!("Behavior Tree {} is valid.", tree_file.tree.name);
-
     Ok(())
 }
 
@@ -439,26 +452,25 @@ fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn Error>> {
     // 1. If the node has children, check if they are valid
     //  a. If a node has no children, check if it is a known node
     //  b. If all children are valid, the node is valid
-    // 2. If node has fallback, check if all fallback nodes are valid
+    // 2. Else If node has fallback, check if all fallback nodes are valid
     // 3. If all nodes are valid, the tree is valid
 
-    if let Some(fallback) = &tree.fallback {
-        // If the node has fallback, check if all fallback nodes are valid
-        for child in fallback {
-            //  If all nodes are valid, the tree is valid
-            validate_node(child, library)?;
+    match &tree.sequence {
+        Some(sequence) => {
+            match sequence {
+                Sequence::Children(children) | Sequence::Fallback(children) => {
+                    for child in children {
+                        validate_node(&child, library).expect("Failed to validate node");
+                    }
+                }
+            }
         }
-    } else if let Some(children) = &tree.children {
-        // If the node has children, check if they are valid
-        for child in children {
-            //  If all children are valid, the node is valid
-            validate_node(child, library)?;
+        None => {
+            if !library.nodes.content.contains_key(&tree.name) {
+                return Err(format!("Node {} is not a known node", tree.name).into());
+            }
         }
-    } else {
-        // If a node has no children, check if it is a known node
-        if !library.nodes.content.contains_key(&tree.name) {
-            return Err(format!("Node {} is not a known node", tree.name).into());
-        }
+
     }
 
     Ok(())
@@ -479,15 +491,6 @@ pub fn root_library_path() -> Result<PathBuf, Box<dyn Error>> {
 
     Ok(library_path)
 }
-
-// fn home_library_path() -> Result<PathBuf, Box<dyn Error>> {
-//    let mut home_dir = dirs::home_dir().expect("Unable to find home directory");
-//    home_dir.push("tmp");
-//    home_dir.push("tcr");
-//    home_dir.push("genodatalib");
-//    home_dir.push("library");
-//    Ok(home_dir)
-//}
 
 fn validate_workflow(
     workflow_file: &WorkflowFile,
