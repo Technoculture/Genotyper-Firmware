@@ -1,5 +1,7 @@
 # Firmware
 
+[![Monorepo Build and Test](https://github.com/TechnocultureResearch/Genotyper-Firmware/actions/workflows/minimal.yml/badge.svg)](https://github.com/TechnocultureResearch/Genotyper-Firmware/actions/workflows/minimal.yml)
+
 ## Getting Started
 ```sh
 cd ./scripts/init.sh
