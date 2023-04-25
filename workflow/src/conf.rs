@@ -1,4 +1,7 @@
-use log::{debug, trace, info};
+use log::{
+    debug, trace, 
+    //info
+};
 use schemars::{schema_for, JsonSchema};
 use semver::Version;
 use serde::{Deserialize, Serialize};
@@ -193,14 +196,14 @@ pub struct Zenoh {
     pub min_reply: ReplyMode,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize, Clone)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum Sequence {
     Children(Vec<Node>), // HAS
     Fallback(Vec<Node>), // HAS
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Node {
     pub name: String,
@@ -209,7 +212,7 @@ pub struct Node {
     pub error: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BehaviorTreeFile {
     file_name: Option<String>,
