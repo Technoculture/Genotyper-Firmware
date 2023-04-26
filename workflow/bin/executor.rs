@@ -42,7 +42,7 @@ pub fn execute_node(node: &Node, library: &Library) -> Result<(), Box<dyn Error>
             }
         }
     } else {
-        debug!("Executing leaf node: {}", node.name);
+        trace!("Executing leaf node: {}", node.name);
     }
     Ok(())
 }
@@ -63,7 +63,7 @@ pub fn execute_tree(tree: &BehaviorTreeFile, library: &Library) -> Result<(), Bo
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialise the logger
     CombinedLogger::init(vec![TermLogger::new(
-        LevelFilter::Debug,
+        LevelFilter::Info,
         Config::default(),
         TerminalMode::Mixed,
         ColorChoice::Auto,

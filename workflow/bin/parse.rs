@@ -13,7 +13,7 @@ struct Args {
     library_path: Option<String>,
 
     /// The name of the workflow to run
-    #[arg(short, long, default_value = "TB PCR")]
+    #[arg(short, long, default_value = "tb_pcr")]
     // workflow_name: Option<String>,
     workflow_name: String,
 

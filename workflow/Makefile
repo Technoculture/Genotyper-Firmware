@@ -3,3 +3,6 @@ plot-dev:
 
 parse:
 	cargo run --bin parse
+
+clean:
+	rm *.png *.dot
