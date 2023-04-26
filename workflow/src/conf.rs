@@ -374,7 +374,7 @@ fn list_files_in_dir(path: &Path) -> HashMap<String, PathBuf> {
 
 pub fn load_library(library_path: &Path) -> Result<Library, Box<dyn Error>> {
     let library_list = list_files_in_dir(library_path);
-    trace!("{:#?}", library_list);
+    debug!("{:#?}", library_list);
 
     // 1. Load the modules file
     let modules = load_file_modules(&library_list["modules"]).expect("Failed to load modules");

@@ -111,7 +111,7 @@ pub mod plotflow {
                 name, error, error_label, error_shape, error_color, error_fontcolor, error_color
             ));
             dot.push_str(&format!(
-                "{} -> {}_{} [color={} style=bold];\n",
+                "{} -> {}_{} [color={} style=bold ];\n",
                 name, name, error, error_color
             ));
         }
