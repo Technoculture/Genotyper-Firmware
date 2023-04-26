@@ -61,7 +61,7 @@ pub mod plotflow {
     use std::fs::File;
     use std::io::Write;
 
-    use workflow::{BehaviorTreeFile, Node, Sequence, WorkflowFile};
+    use workflow::{get_tree_by_name, BehaviorTreeFile, Library, Node, Sequence, WorkflowFile};
 
     pub enum Input<'a> {
         Tree(&'a BehaviorTreeFile),
@@ -138,33 +138,64 @@ pub mod plotflow {
     pub fn workflow_to_dot<'a>(
         workflow: &WorkflowFile,
         starting_block: &'a mut String,
+        library: &Library,
     ) -> Result<&'a mut String, Box<dyn Error>> {
-        let steps = &workflow.workflow;
+        let step_names: Vec<String> = workflow
+            .workflow
+            .iter()
+            .map(|step| step.name.clone())
+            .collect();
 
-        for step in steps {}
+        // draw the workflow
+        let workflow_steps_label = step_names
+            .iter()
+            .enumerate()
+            .map(|(index, action)| format!("{} | <{}> {} ", index + 1, index + 1, action))
+            .collect::<Vec<String>>()
+            .join("| ");
+
+        starting_block.push_str(&format!(
+            "workflow [shape=record, label=\"workflow | {{ {} }}\"];\n",
+            workflow_steps_label
+        ));
+
+        // draw the trees
+        for (index, name) in step_names.iter().enumerate() {
+            let tree = get_tree_by_name(name, &library)?;
+
+            // let mut tree_dot = starting_block.clone();
+            tree_to_dot(&tree, starting_block)?;
+
+            // draw edges between workflow and trees
+            starting_block.push_str(&format!(
+                "workflow:{} -> {} [style=solid color=10];\n",
+                index + 1,
+                name
+            ));
+        }
 
         Ok(starting_block)
     }
 
-    pub fn input_to_dot(input: &Input) -> Result<String, Box<dyn Error>> {
+    pub fn input_to_dot(input: &Input, library: &Library) -> Result<String, Box<dyn Error>> {
         match input {
             Input::Tree(tree) => {
                 let mut dot = starting_block(tree.title.clone());
-                tree_to_dot(&tree, &mut dot);
+                tree_to_dot(&tree, &mut dot)?;
                 dot.push_str("}\n");
                 Ok(dot)
             }
             Input::Workflow(workflow) => {
                 let mut dot = starting_block(workflow.title.clone());
-                workflow_to_dot(&workflow, &mut dot);
+                workflow_to_dot(&workflow, &mut dot, &library)?;
                 dot.push_str("}\n");
                 Ok(dot)
             }
         }
     }
 
-    pub fn input_to_png(input: &Input) -> Result<Vec<u8>, Box<dyn Error>> {
-        let dot = input_to_dot(input)?;
+    pub fn input_to_png(input: &Input, library: &Library) -> Result<Vec<u8>, Box<dyn Error>> {
+        let dot = input_to_dot(input, &library)?;
         let mut cmd = std::process::Command::new("dot");
         cmd.arg("-Tpng");
         let mut child = cmd
@@ -217,14 +248,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let out = get_tree_by_name(&tree_name, &library).expect("Failed to get tree");
         trace!("{:#?}", out);
 
-        let dot = plotflow::input_to_dot(&plotflow::Input::Tree(out))?;
+        let dot = plotflow::input_to_dot(&plotflow::Input::Tree(out), &library)?;
         trace!("{}", dot);
 
         // Save dot in a text file named output.dot
         let mut file = File::create("output_tree.dot")?;
         file.write_all(dot.as_bytes())?;
 
-        let image_data = plotflow::input_to_png(&plotflow::Input::Tree(out))?;
+        let image_data = plotflow::input_to_png(&plotflow::Input::Tree(out), &library)?;
         plotflow::save_image_to_file(image_data, "tree.png")?;
     }
 
@@ -232,14 +263,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let out = get_workflow_by_title(&worflow_name, &library)?;
         trace!("{:?}", out);
 
-        let dot = plotflow::input_to_dot(&plotflow::Input::Workflow(out))?;
+        let dot = plotflow::input_to_dot(&plotflow::Input::Workflow(out), &library)?;
         trace!("{}", dot);
 
         // Save dot in a text file named output.dot
         let mut file = File::create("output_workflow.dot")?;
         file.write_all(dot.as_bytes())?;
 
-        let image_data = plotflow::input_to_png(&plotflow::Input::Workflow(out))?;
+        let image_data = plotflow::input_to_png(&plotflow::Input::Workflow(out), &library)?;
         plotflow::save_image_to_file(image_data, "workflow.png")?;
     }
 

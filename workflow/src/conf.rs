@@ -1,5 +1,6 @@
 use log::{
-    debug, trace, 
+    debug,
+    trace,
     //info
 };
 use schemars::{schema_for, JsonSchema};
@@ -90,7 +91,7 @@ pub struct RequestSchema {
     pub response: Option<Vec<ValueSchema>>,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema, Deserialize)]
 pub enum Unit {
     #[serde(rename = "C")]
     CELSIUS,
@@ -103,7 +104,7 @@ pub enum Unit {
     MINUTES,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValueSchema {
     pub name: String,
@@ -113,7 +114,7 @@ pub struct ValueSchema {
     pub unit: Option<Unit>,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Value {
     #[serde(flatten)]
@@ -224,7 +225,7 @@ pub struct BehaviorTreeFile {
     pub tree: Node,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WorkflowFile {
     file_name: Option<String>,
@@ -236,7 +237,7 @@ pub struct WorkflowFile {
     pub process_tldr: String,
 }
 
-#[derive(Debug, PartialEq, Serialize, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WorkflowStep {
     pub name: String,
@@ -344,14 +345,16 @@ fn validate_nodes_library(
 fn name_from_path(path: &Path) -> String {
     let file_name = path.file_name().unwrap().to_str().unwrap();
     //println!("file_name: {:#?}", file_name.clone().split(".yaml"));
-    let file_name_no_ext = file_name.split(".yaml")
+    let file_name_no_ext = file_name
+        .split(".yaml")
         .next()
         .expect(format!("Invalid file name: {}", file_name).as_str());
     trace!("{} file found.", file_name_no_ext);
 
-    let file_name_no_prefix = file_name_no_ext.split(".").next().expect(
-        format!("Invalid file name: {}", file_name_no_ext).as_str(),
-    );
+    let file_name_no_prefix = file_name_no_ext
+        .split(".")
+        .next()
+        .expect(format!("Invalid file name: {}", file_name_no_ext).as_str());
 
     trace!("file_name_no_prefix: {:#?}", file_name_no_prefix);
 
@@ -459,21 +462,18 @@ fn validate_node(tree: &Node, library: &Library) -> Result<(), Box<dyn Error>> {
     // 3. If all nodes are valid, the tree is valid
 
     match &tree.sequence {
-        Some(sequence) => {
-            match sequence {
-                Sequence::Children(children) | Sequence::Fallback(children) => {
-                    for child in children {
-                        validate_node(&child, library).expect("Failed to validate node");
-                    }
+        Some(sequence) => match sequence {
+            Sequence::Children(children) | Sequence::Fallback(children) => {
+                for child in children {
+                    validate_node(&child, library).expect("Failed to validate node");
                 }
             }
-        }
+        },
         None => {
             if !library.nodes.content.contains_key(&tree.name) {
                 return Err(format!("Node {} is not a known node", tree.name).into());
             }
         }
-
     }
 
     Ok(())
