@@ -1,20 +1,20 @@
 use clap::Parser;
+use log::{debug, info, trace};
+use simplelog::*;
+use std::error::Error;
 use workflow::conf::{
     get_tree_by_name, load_library, root_library_path, BehaviorTreeFile, Library, ModuleFile, Node,
 };
 use workflow::Sequence;
-use log::{debug, info, trace};
-use simplelog::*;
-use std::error::Error;
 
-use async_std::prelude::*;
+use async_recursion::async_recursion;
 use async_std::channel::{bounded, Receiver, Sender};
+use async_std::prelude::*;
 use async_std::task;
 use std::io::{stdin, BufRead};
 use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
 use std::thread;
-use async_recursion::async_recursion;
+use std::time::{Duration, Instant};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -98,5 +98,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // trace!("{:?}", out);
 
     let tree = get_tree_by_name(&args.tree_name, &library).expect("Failed to get tree");
-    execute_tree(&tree, &library).await
+    // execute_tree(&tree, &library).await
+
+    Ok(())
 }

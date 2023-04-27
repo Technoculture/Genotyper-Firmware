@@ -1,6 +1,6 @@
-use workflow::{get_tree_by_name, get_workflow_by_title, root_library_path, load_library};
-use log::{info, error};
+use log::{error, info};
 use simplelog::*;
+use workflow::{get_tree_by_name, get_workflow_by_title, load_library, root_library_path};
 
 const LOG_FILE: &str = "/tmp/tcr/mockze.log";
 
@@ -9,15 +9,18 @@ fn main() {
     CombinedLogger::init(vec![
         TermLogger::new(
             LevelFilter::Debug,
-            // LevelFilter::Info, 
-            Config::default(), 
+            // LevelFilter::Info,
+            Config::default(),
             TerminalMode::Mixed,
-            ColorChoice::Auto),
+            ColorChoice::Auto,
+        ),
         WriteLogger::new(
-            LevelFilter::Info, 
-            Config::default(), 
-            std::fs::File::create(LOG_FILE).unwrap()),
-    ]).unwrap();
+            LevelFilter::Info,
+            Config::default(),
+            std::fs::File::create(LOG_FILE).unwrap(),
+        ),
+    ])
+    .unwrap();
 
     info!("Starting mockze");
 
@@ -40,4 +43,3 @@ fn main() {
 
     // 3. Start all the mock services in seperate processes
 }
-
