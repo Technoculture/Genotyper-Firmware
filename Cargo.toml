@@ -3,6 +3,7 @@
 members = [
     # Building and Running
     "xtask",
+    "mockze",
 
     # Libraries
     "workflow",

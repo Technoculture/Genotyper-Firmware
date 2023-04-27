@@ -1,0 +1,95 @@
+# Reusable Conditions
+needs_a_pipette: &needs_a_pipette
+  preconditions: A Pipette should be available, A Pipette should be mounted as the currently active tool
+  needs_tool: A Pipette
+
+# Nodes
+is_tip_available:
+  mode: condition
+  description: Verify if a tip is available for use
+  <<: &needs_a_pipette
+
+tip_stock_error:
+  mode: action
+  description: Address an error related to the tip stock
+
+is_tip_available_in_tray:
+  mode: condition
+  description: Check if the tip is available in the tray
+
+is_discard_success:
+  mode: condition
+  description: Check if the discard was successful
+
+tray_maintainance_error:
+  mode: action
+  description: Handle tray maintainance error
+
+is_load_new_tray_successful:
+  mode: condition
+  description: Check if the load new tray was successful
+
+load_new_tray_maintenance_error:
+  mode: action
+  description: Handle load new tray maintainance error
+
+is_already_in_position:
+  mode: condition
+  description: Check if the tip slider is already in position
+
+is_slider_position_reached:
+  mode: condition
+  description: Check if the tip slider position was reached
+
+is_caught_tip_firm_and_oriented:
+  mode: condition
+  description: Check if the caught tip is firm and oriented
+  <<: &needs_a_pipette
+
+is_pick_up_success:
+  mode: condition
+  description: Check if the pick up was successful
+  <<: &needs_a_pipette
+
+handle_pickup_failure:
+  mode: action
+  description: Handle pick up failure
+  <<: &needs_a_pipette
+
+move_slider_to_load_position:
+  mode: action
+  description: Move the tip slider to load position
+
+load_next_tray:
+  mode: action
+  description: Load the next tray
+
+move_tip_slider_to_position:
+  mode: action
+  description: Move the tip slider to position
+  <<: &needs_a_pipette
+
+pick_up_tip_using_gantry:
+  mode: action
+  description: Pick up tip using gantry
+  <<: &needs_a_pipette
+
+goto_discard_position:
+  mode: action
+  description: Go to discard position
+  <<: &needs_a_pipette
+
+prepare_to_discard:
+  mode: action
+  description: Prepare to discard
+  <<: &needs_a_pipette
+
+eject_tip:
+  mode: action
+  description: Eject tip
+  <<: &needs_a_pipette
+
+is_discard_tip_successful:
+  mode: condition
+  description: Check if the discard tip was successful
+  <<: &needs_a_pipette

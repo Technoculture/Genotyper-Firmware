@@ -1,5 +1,18 @@
 # Firmware
 
+[![Monorepo Build and Test](https://github.com/TechnocultureResearch/Genotyper-Firmware/actions/workflows/minimal.yml/badge.svg)](https://github.com/TechnocultureResearch/Genotyper-Firmware/actions/workflows/minimal.yml)
+
+## Getting Started
+```sh
+cd ./scripts/init.sh
+```
+Probably has a bunch of undocumented dependencies. Use a Unix based OS (Not intended for windows but may work fine)
+
+# More Info
+Docker Files, Docker Compose Files, Etc.
+1. Dockerfile for a bunch of mock zenoh nodes (Generated form yaml files about for modules), lets use python for such things? Use Makefile/Cargo build.rs or a bash file?
+2. Generate and orchestrate a zoo of mock zenoh modules: Docker Compose? Or Python + Docker SDK?
+
 ```sh
 # Build all subprojects
 cargo build
@@ -7,6 +20,7 @@ cargo build
 # Test all subprojects
 cargo test
 ```
+
 > Subprojects exclude firware crates. They currently require to be built and tested separately.
 
 ## Probable List of Modules
