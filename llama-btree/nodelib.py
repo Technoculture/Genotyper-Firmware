@@ -178,7 +178,7 @@ def move_tip_slider_to_position(input: str):
 
 
 @node_tool
-def pick_up_tip_using_gantry(input: str):
+def pickup_tip_using_gantry(input: str):
     """
     mode: action
     description: Pick up tip using gantry
