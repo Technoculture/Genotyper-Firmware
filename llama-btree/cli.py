@@ -15,11 +15,14 @@ import os
 import json
 from datetime import datetime
 import langchain_visualizer
-from langchain.llms import OpenAI, HuggingFacePipeline
+# from langchain.llms import OpenAI, HuggingFacePipeline
+from langchain.llms import HuggingFacePipeline
+from langchain.chat_models import ChatOpenAI
 from langchain import LLMChain
 from langchain.agents import ZeroShotAgent, AgentExecutor
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from nodelib import *
+from cred import API_KEY
 
 tools = [
     is_tip_available,
@@ -50,7 +53,8 @@ tool_names = [tool.name for tool in tools]
 def get_llm(*, vendor: str = "openai", model_name: str = ""):
     if vendor == "openai":
         model_name = "gpt-3.5-turbo" if model_name == "" else model_name
-        llm = OpenAI(temperature=0, model_name=model_name, verbose=True)
+        llm = ChatOpenAI(temperature=0, model_name=model_name, openai_api_key=API_KEY, verbose=True)
+        # llm = OpenAI(temperature=0, model_name=model_name, openai_api_key=API_KEY, verbose=True)
         return llm
     elif vendor == "hf":
         model_name = "cerebras/Cerebras-GPT-111M" if model_name == "" else model_name

@@ -1,6 +1,7 @@
 
 all:
-	python cli.py
+# python cli.py
+	py -3.10 cli.py
 
 shell:
 	pipenv shell
