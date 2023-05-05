@@ -14,6 +14,8 @@ Task:
 import os
 import json
 from datetime import datetime
+import asyncio
+# from langchain_visualizer import visualize
 import langchain_visualizer
 # from langchain.llms import OpenAI, HuggingFacePipeline
 from langchain.llms import HuggingFacePipeline
@@ -119,4 +121,31 @@ async def llmtree_agent():
 
     return output
 
-langchain_visualizer.visualize(llmtree_agent)
+
+# llmtree_ = await llmtree_agent()
+# langchain_visualizer.visualize(llmtree_agent())
+# await langchain_visualizer.visualize(await llmtree_agent())
+
+async def visualize_llmtree_agent():
+    output = await llmtree_agent()
+    # await langchain_visualizer.visualize(output)
+    await langchain_visualizer.visualize(output["log"])
+
+
+# async def main():
+#     await visualize_llmtree_agent()
+
+# asyncio.run(main())
+asyncio.run(visualize_llmtree_agent())
+
+
+# async def main():
+#     llmtree = await llmtree_agent()
+#     log = llmtree["log"]
+#     # visualize([log])
+#     langchain_visualizer.visualize([log])
+
+
+# if __name__ == "__main__":
+#     asyncio.run(main())
+
