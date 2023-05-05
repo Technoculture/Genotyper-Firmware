@@ -8,13 +8,13 @@ use workflow::conf::{
 use workflow::Sequence;
 
 use async_recursion::async_recursion;
-use async_std::channel::{bounded, Receiver, Sender};
-use async_std::prelude::*;
-use async_std::task;
-use std::io::{stdin, BufRead};
-use std::sync::{Arc, Mutex};
-use std::thread;
-use std::time::{Duration, Instant};
+use async_std::channel::{Receiver};
+
+
+
+
+
+
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -36,7 +36,7 @@ async fn module_task(receiver: Receiver<Node>, modules: &ModuleFile) {
     }
 }
 
-async fn execute_leaf_node(node: &Node, modules: &ModuleFile) -> Result<(), Box<dyn Error>> {
+async fn execute_leaf_node(node: &Node, _modules: &ModuleFile) -> Result<(), Box<dyn Error>> {
     info!("Executing leaf node: {}", node.name);
     async_std::task::sleep(std::time::Duration::from_millis(200)).await;
     Ok(())
@@ -97,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let out = get_workflow_by_title(&args.workflow_name, &library).expect("Failed to get workflow");
     // trace!("{:?}", out);
 
-    let tree = get_tree_by_name(&args.tree_name, &library).expect("Failed to get tree");
+    let _tree = get_tree_by_name(&args.tree_name, &library).expect("Failed to get tree");
     // execute_tree(&tree, &library).await
 
     Ok(())
