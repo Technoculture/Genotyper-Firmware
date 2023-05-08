@@ -1,14 +1,12 @@
-# Step1: Deserialize the nodes.lib.yaml file into python objects using Pydantic
 '''
-Module to deserialize the library trees input file nodes.lib.yaml
+Module to deserialize the library trees input file nodes.lib.yaml. 
 '''
 
 import yaml
-# from typing import List
-from pydantic import BaseModel
-from typing import Optional
-from enum import Enum
-from typing import Callable, List, Optional
+from pydantic import BaseModel#, Field
+from typing import Callable, List, Optional#, Union
+# from enum import Enum
+# from abc import ABC, abstractmethod
 import re
 from langchain.agents import Tool
 
@@ -29,35 +27,13 @@ class Node(BaseModel):
 
 
 # extracting contents
-with open('tmp\\tcr\\genodatalib\\library\\nodes.lib.yaml', "r") as f:
+with open('C:\\Users\\mishr\\OneDrive\\Documents\\tmp\\tcr\\genodatalib\\library\\nodes.lib.yaml', "r") as f:
     nodes_dict = yaml.safe_load(f)
 
 # deserializing
 # deserialized_nodes = [(nodes,Node.parse_obj(node_dict)) for nodes,node_dict in nodes_dict['content'].items()]
-deserialized_nodes = [Node.parse_obj(node_dict) for node_dict in nodes_dict['content'].items()]
-
-# output: deserialized contents as python objects
-# for node_name,node in deserialized_nodes:
-
-#     # node name
-#     print(node_name)
-
-#     # type
-#     print(node.type)
-
-#     # zenoh
-#     if node.zenoh is not None:
-
-#         # modules
-#         print(node.zenoh.modules)
-#         # min_reply
-#         print(node.zenoh.min_reply)
-#     else:
-#         print(None)
-#         print(None)
-
-#     # description
-#     print(node.description)
+deserialized_nodes = [Node.parse_obj(node_dict) for node_dict in nodes_dict['content'].values()]
+# print(deserialized_nodes)
 
 class NodeInput(BaseModel):
     name: str
@@ -87,6 +63,7 @@ class NodeInput(BaseModel):
         fields["executor"] = fn
         fields["name"] = fn.__name__
 
+        # output: deserialized contents as python objects
         for node in deserialized_nodes:
             # type
             fields["mode"] = node.type
@@ -105,21 +82,26 @@ class NodeInput(BaseModel):
 
 
 def node_to_tool(node: NodeInput) -> Tool:
+    '''
+    A function that takes node as a collection of class NodeInput objects and returns a Tool that takes a tool function as input.
+    '''
+
     need_tool_str = f"NEEDS TOOL = {node.needs_tool}" if node.needs_tool else ""
     preconditions_str = f"!!! PRECONDITIONS = {', '.join(node.preconditions)}" if node.preconditions else "No preconditions"
 
     return Tool(
-        node.name,
+        f"Executing {node.name}; Fetching each zenoh module for use in the list {node.modules} one by one; Collective final response allowed for all available zenoh modules can be {node.min_reply} number of times",
         node.executor,
         f"{node.description}; [{preconditions_str}; {need_tool_str}]; Accepts inputs of the form: {node.input_format}",
     )
 
 
 def node_tool(fn: Callable) -> Tool:
+    '''
+    Function decorates a tool function's returned string response with the string inputs used as Tool class instance
+    '''
     node = NodeInput.from_docstring(fn)
     return node_to_tool(node)
-
-from compile import node_tool
 
 
 def send(address, payload):
