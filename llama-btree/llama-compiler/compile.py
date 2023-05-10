@@ -27,7 +27,7 @@ class Node(BaseModel):
 
 
 # extracting contents
-with open('C:\\Users\\mishr\\OneDrive\\Documents\\tmp\\tcr\\genodatalib\\library\\nodes.lib.yaml', "r") as f:
+with open('\\tmp\\tcr\\genodatalib\\library\\nodes.lib.yaml', "r") as f:
     nodes_dict = yaml.safe_load(f)
 
 # deserializing
