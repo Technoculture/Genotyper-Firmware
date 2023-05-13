@@ -6,7 +6,7 @@ Objectives:
     - Preconditions should be checked before executing the tool
     - The tree should be traversed in a depth-first manner
     - Visualize the generated tree
-
+    - We will be using the reactive control nodes system to generate the behavior tree
 Task:
     - Given a task in english, generate a correct behavior tree
 """
@@ -15,6 +15,7 @@ import os
 import json
 from datetime import datetime
 import asyncio
+import random
 
 # from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
@@ -29,7 +30,7 @@ import langchain_visualizer
 from graphviz import Digraph
 
 from new_compile import *
-from cred import API_KEY
+from cred import API_KEY, MyApiKEY
 
 
 # def get_llm(*, vendor: str = "openai", model_name: str = ""):
@@ -53,14 +54,15 @@ from cred import API_KEY
 
 # llm = get_llm()
 
-llm = ChatOpenAI(temperature=0.0, model_name="gpt-3.5-turbo", openai_api_key=API_KEY)
+llm = ChatOpenAI(temperature=0.0, model_name="gpt-3.5-turbo", openai_api_key=MyApiKEY)
 
 # prefix = """Given a task description, generate a sequence of actions that can be performed to complete the task input.
 # Only use the available tools to complete the task. A tool is a collection of information that you will use to generate the actionable steps to complete the task. A tool consists of a node with a 'node name' that defines one of the sub-task needed to complete the main given task,
 # a 'node type' is the node's type that defines what a tool's node is, a list of 'zenoh modules' that is used to create actionable steps by taking each firmware module as a physical tool, 'minimum reply' that decides how many actionable steps you can generate per 'node_name', 'description' that is telling what the particular tool is doing.
 # You have access to the following tools: """
 
-prefix = """Act as a robotic task planner. Given a task description, you have to complete the task by planning and generating a sequence of actionable steps.
+prefix = """Act as a task planner. Given a task description, you have to complete the task by planning a sequence of actionable steps
+for the modules present in each tool. The list variable module in each tool is a list of names of physical tools. 
 Only use the available tools to complete the task. Check the validity of each tool description. Use a tool only once.
 You have access to the following tools:
 {tools} """
@@ -80,79 +82,9 @@ prompt = PromptTemplate(input_variables=["input"],
 llm_chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
 
 q = "Pick up the sample and place it in the PCR."
-output = llm_chain({"input": q})
+# output = llm_chain({"input": q})
 
-import random
 
-# Define a function to check if a tip is available
-def is_tip_available():
-    return random.choice([True, False])
-
-# Define a function to check for errors related to tip stock/inventory
-def tip_stock_error():
-    return random.choice([True, False])
-
-# Define a function to load the next tray
-def load_next_tray():
-    return "Loading next tray..."
-
-# Define a function to pick up a tip using gantry
-def pick_up_tip_using_gantry():
-    return "Picking up the tip using gantry..."
-
-# Define a function to check if the tip is caught firmly and oriented
-def is_caught_tip_firm_and_oriented():
-    return random.choice([True, False])
-
-# Define a function to move the slider to the load position
-def move_slider_to_load_position():
-    return "Moving slider to load position..."
-
-# Define a function to move the tip slider to the required position
-def move_tip_slider_to_position():
-    return "Moving tip slider to position..."
-
-# Define a function to check if the slider position is reached
-def is_slider_position_reached():
-    return random.choice([True, False])
-
-# Define a function to check if the tip is available in the tray
-def is_tip_available_in_tray():
-    return random.choice([True, False])
-
-# Define a function to prepare to discard the used tip
-def prepare_to_discard():
-    return "Preparing to discard the used tip..."
-
-# Define a function to move to the discard position
-def goto_discard_position():
-    return "Moving to the discard position..."
-
-# Define a function to eject the used tip
-def eject_tip():
-    return "Ejecting the used tip..."
-
-# Define a function to check if the discard of the tip was successful
-def is_discard_tip_successful():
-    return random.choice([True, False])
-
-# # Define a function to load a new tray
-# def load_next_tray_using_tool():
-#     return "Loading next tray using tool..."
-
-# Define a function to handle errors related to stock/inventory
-def handle_stock_error():
-    # Check for errors related to stock/inventory using Tool 2: tip_stock_error
-    if tip_stock_error():
-        return "Error: Tip stock/inventory issue detected. Please resolve the issue and try again."
-    # Load the next tray using Tool 7: load_next_tray
-    else:
-        return load_next_tray()
-
-# Define a function to handle errors related to tray maintenance
-def handle_tray_error():
-    # Load the next tray using Tool 7: load_next_tray
-    return load_next_tray()
 
 # Define a function to generate the behavior tree response
 class NodeText:
@@ -160,19 +92,7 @@ class NodeText:
         self.text = text
         self.children = children
 
-tools = {
-    'is_tip_available': 'Tool 1',
-    'tip_stock_error': 'Tool 2',
-    'load_next_tray': 'Tool 7',
-    'pick_up_tip_using_gantry': 'Tool 14',
-    'is_caught_tip_firm_and_oriented': 'Tool 15',
-    'move_slider_to_load_position': 'Tool 6',
-    'move_tip_slider_to_position': 'Tool 10',
-    'is_slider_position_reached': 'Tool 11',
-    'is_tip_available_in_tray': 'Tool 3',
-    'prepare_to_discard': 'Tool 17',
-    'goto_discard_position': 'Tool 16',
-    'eject_tip': 'Tool 18',}
+
 
 def generate_response(tools):
     steps = [
@@ -213,7 +133,9 @@ def generate_behavior_tree(root):
 rootsteps = generate_response(tools)  # list of Node objects
 root_node = rootsteps[0]  # select the first node as the root of the behavior tree
 behavior_tree = generate_behavior_tree(root_node)
+output = llm_chain({"input": q}, behavior_tree)
 print(behavior_tree)
+
                
 
 # langchain_visualizer.visualize(generate_behavior_tree(root))
