@@ -130,15 +130,15 @@ class Commands:
         tipRM = ["10ml", "100ml", "1000ml"]
         if self.key_list[2] == "any":
             if "TipRM" in self.key_list[1] and tipRM:
-                answer = f"This node is {self.key_list[0]}.\
+                answer = (f"This node is {self.key_list[0]}.\
                     The pipette must be attached to the system before picking up the tip.\
                     {self.key_list[3]}.\
                         The zenoh module TipRM is available.\
-                            Proceed to choose and pick-up a tip."
+                            Proceed to choose and pick-up a tip.", True)
             else:
-                answer = "The zenoh TipRM isn't available. Please arrange tip stock in TipRM. Waiting for TipRM to be filled..."
+                answer = ("The zenoh TipRM isn't available. Please arrange tip stock in TipRM. Waiting for input TipRM tray to be filled...", False)
         else:
-            answer = "The pipette is attached to the system but the zenoh TipRM isn't available."
+            answer = ("The pipette is attached to the system. The zenoh module TipRM is available.", True)
 
         return answer
 
@@ -162,20 +162,21 @@ class Commands:
         tipRM_tray = ["10ml", "100ml", "1000ml"]
         if "TipRM" in self.key_list[1] and input in tipRM_tray:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
+                answer = (f"This node is {self.key_list[0]}.\
                     {self.key_list[3]}.\
-                        Tip {input} from zenoh module TipRM is available in the tray."
+                        Tip {input} from zenoh module TipRM is available in the tray.", True)
             else:
-                answer = f"{input} Tip is available in the tray."
+                answer = (f"Tip is available in the tray.",True)
         else:
-            answer = f"TipRM {input} tip is not available in the tray.\
-                Please place the {input} tip in the tray."
+            answer = (f"TipRM {input} tip is not available in the tray.\
+                {self.key_list[3]}\
+                    Please place the {input} tip in the tray.", False)
 
         return answer
 
     def move_slider_to_load_position(self, tip_tray_info):
 
-        if tip_tray_info and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "Pipette" in self.key_list[1]:
             if self.key_list[2] == "any":
                 answer = f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
@@ -183,31 +184,31 @@ class Commands:
                             zenoh tip is present in the tray of {self.key_list[1]}.\
                                 Moved tip slider to load position."
             else:
-                answer = "Pipette is present, Pipette is the actively mounted tool. Moved tip slider to load position."
-        else:
-            answer = f"{self.key_list[3]}. Moved tip slider to load position."
-
-        return answer
-
-    def is_already_in_position(self, tip_tray_info):
-
-        if tip_tray_info and "Pipette" in self.key_list[1]:
-            if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Tip slider is already in position."
-            else:
-                answer = "Pipette is present, Pipette is the actively mounted tool. Tip slider is already in position."
+                answer = f"Pipette is present, Pipette is the actively mounted tool. Moved tip slider to load position."
         else:
             answer = f"{self.key_list[3]}."
 
         return answer
 
+    def is_already_in_position(self, tip_tray_info):
+
+        if tip_tray_info == True and "Pipette" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = (f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Tip slider is already in position.", True)
+            else:
+                answer = ("Pipette is present, Pipette is the actively mounted tool. Tip slider is already in position.", True)
+        else:
+            answer = (f"{self.key_list[3]}.", False)
+
+        return answer
+
     def move_tip_slider_to_position(self, tip_tray_info):
 
-        if tip_tray_info and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "Pipette" in self.key_list[1]:
             if self.key_list[2] == "any":
                 answer = f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
@@ -224,24 +225,24 @@ class Commands:
 
     def is_slider_position_reached(self, tip_tray_info):
 
-        if tip_tray_info and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "Pipette" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
+                answer = (f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
                         {self.key_list[3]}.\
                             zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Tip slider position was reached."
+                                Tip slider position was reached.", True)
             else:
-                answer = "Pipette is present, Pipette is the actively mounted tool. Tip slider position was reached."
+                answer = ("Pipette is present, Pipette is the actively mounted tool. Tip slider position was reached.", True)
         else:
-            answer = f"{self.key_list[3]}."
+            answer = (f"{self.key_list[3]}.", False)
 
         return answer
 
 
     def pick_up_tip_using_gantry(self, tip_tray_info):
 
-        if tip_tray_info and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "Gantry" in self.key_list[1]:
             if self.key_list[2] == "any":
                 answer = f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
@@ -258,20 +259,139 @@ class Commands:
     
     def is_caught_tip_firm_and_oriented(self, tip_tray_info):
 
-        if tip_tray_info and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "Pipette" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = (f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Caught tip is firm and oriented.", True)
+            else:
+                answer = ("Pipette is present, Pipette is the actively mounted tool. Caught tip is firm and oriented.", True)
+        else:
+            answer = (f"{self.key_list[3]}.", False)
+
+        return answer
+
+    def goto_discard_position(self, tip_tray_info):
+
+        if tip_tray_info == True and "Gantry" in self.key_list[1]:
             if self.key_list[2] == "any":
                 answer = f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
                         {self.key_list[3]}.\
                             zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Caught tip is firm and oriented."
+                                Moved the tip to discard position."
             else:
-                answer = "Pipette is present, Pipette is the actively mounted tool. Caught tip is firm and oriented."
+                answer = "Pipette is present, Pipette is the actively mounted tool. Moved the tip to discard position."
+        else:
+            answer = f"{self.key_list[3]}."
+
+        return answer
+    
+    def prepare_to_discard(self, tip_tray_info):
+
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Prepared to discard the tip."
+            else:
+                answer = "Pipette is present, Pipette is the actively mounted tool. Prepared to discard the tip."
+        else:
+            answer = f"{self.key_list[3]}."
+
+        return answer
+    
+    def eject_tip(self, tip_tray_info):
+
+        if tip_tray_info == True and self.key_list[1] == ["Pipette", "TipRM"]:
+            if self.key_list[2] == "any":
+                answer = f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Ejected the tip."
+            else:
+                answer = "Pipette is present, Pipette is the actively mounted tool. Ejected the tip."
         else:
             answer = f"{self.key_list[3]}."
 
         return answer
 
+    def is_discard_tip_successful(self, tip_tray_info):
+
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = (f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Discarded tip successfully.", True)
+            else:
+                answer = ("Pipette is present, Pipette is the actively mounted tool. Discarded tip successfully.", True)
+        else:
+            answer = (f"{self.key_list[3]}.", False)
+
+        return answer
+
+    def is_discard_success(self, tip_tray_info):
+
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = (f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                The discarded tip is in the tray.", True)
+            else:
+                answer = ("Pipette is present, Pipette is the actively mounted tool. The discarded tip is in the tray.", True)
+        else:
+            answer = (f"{self.key_list[3]}.", False)
+
+        return answer
+
+    def load_next_tray(self, tip_tray_info):
+
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tip is present in the tray of {self.key_list[1]}.\
+                                Load the next tray."
+            else:
+                answer = "Pipette is present, Pipette is the actively mounted tool. Load the next tray."
+        else:
+            answer = f"{self.key_list[3]}."
+
+        return answer
+    
+    def load_new_tray_maintainance_error(self):
+
+        answer = f"This node is {self.key_list[0]}.\
+                    zenoh {self.key_list[1]} is not present in the tray.\
+                        Can't load the next tray."
+
+        return answer
+    
+    def is_load_new_tray_successful(self, tip_tray_info):
+
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+            if self.key_list[2] == "any":
+                answer = (f"This node is {self.key_list[0]}.\
+                    Pipette is present, Pipette is the actively mounted tool.\
+                        {self.key_list[3]}.\
+                            zenoh tips from {self.key_list[1]} is present in the tray.\
+                                Loaded the new tray successfully.", True)
+            else:
+                answer = ("Pipette is present, Pipette is the actively mounted tool. Loaded the new tray successfully.", True)
+        else:
+            answer = (f"{self.key_list[3]}.", False)
+
+        return answer
 
 # # for fn_name in tools.keys():
 # if  "is_tip_available" in tools.keys():
