@@ -242,56 +242,76 @@ functions = ['is_tip_available',
 def generate_behavior_tree(root):
 
     tree = ['Root']
-    
+
     # root = NodeText(functions[0])
-    
+    node_children = []
+    tip_tray_info = []
+
     def traverse(node, level):
-        tip = input("Enter the input tip: ")
+        # tip = input("Enter the input tip: ")
         if getattr(Commands(fn_name=node.text,tools=tools), node.text):
             func_name = getattr(Commands(fn_name=node.text,tools=tools), node.text)
-            tip_tray_info = []
 
             if node.text == 'is_tip_available_in_tray':
+                tip = input("Enter the input tip: ")
                 tree.append('\t'*level + '- ' + func_name(input=tip)[0])
-                tip_tray_info.append(func_name()[1])
+                tip_tray_info.insert(0,func_name(input=tip)[1])
             elif node.text not in ['is_tip_available', 'tip_stock_error', 'load_new_tray_maintainance_error']:
-                tip_tray_info = tip_tray_info[0]
-                tree.append('\t'*level + '- ' + func_name(tip_tray_info)[0])
+                # tip_tray_info = tip_tray_info[0]
+                tree.append('\t'*level + '- ' + func_name(tip_tray_info[0])[0])
             else:
                 tree.append('\t'*level + '- ' + func_name()[0])
-                tree.append('')
+            # tree.append("Place the sample in the PCR.")
 
             if node.text == 'is_tip_available':
-                node = NodeText(text=node.text, children = NodeText(node.text).tip_avail(func_name()[1]))
+                # x = NodeText(text=node.text, children = NodeText(node.text).tip_avail(func_name()[1]))
+                # print(x.children)
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tip_avail(func_name()[1])))
             elif node.text == 'tip_stock_error':
-                node = NodeText(text=node.text, children = NodeText(node.text).tip_stock())
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tip_stock()))
             elif node.text == 'is_tip_available_in_tray':
-                node = NodeText(text=node.text, children = NodeText(node.text).tip_tray(func_name(input=tip)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tip_tray(tip_tray_info[0])))
             elif node.text == 'is_already_in_position':
-                node = NodeText(text=node.text, children = NodeText(node.text).slider_pos(func_name(tip_tray_info)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).slider_pos(func_name(tip_tray_info)[1])))
             elif node.text == 'is_slider_position_reached':
-                node = NodeText(text=node.text, children = NodeText(node.text).pos_reach(func_name(tip_tray_info)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).pos_reach(func_name(tip_tray_info)[1])))
             elif node.text == 'is_caught_tip_firm_and_oriented':
-                node = NodeText(text=node.text, children = NodeText(node.text).caught_tip(func_name(tip_tray_info)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).caught_tip(func_name(tip_tray_info)[1])))
             elif node.text == 'is_discard_tip_successful':
-                node = NodeText(text=node.text, children = NodeText(node.text).discard_tip(func_name(tip_tray_info)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_tip(func_name(tip_tray_info)[1])))
             elif node.text == 'is_discard_success':
-                node = NodeText(text=node.text, children = NodeText(node.text).discard_success(func_name(tip_tray_info)[1], tip_tray_info))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_success(func_name(tip_tray_info)[1], tip_tray_info)))
             elif node.text == 'is_load_new_tray_successful':
-                node = NodeText(text=node.text, children = NodeText(node.text).load_tray_success(func_name(tip_tray_info)[1]))
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).load_tray_success(func_name(tip_tray_info)[1])))
             elif node.text == 'load_new_tray_maintainance_error':
-                node = NodeText(text=node.text, children = NodeText(node.text).tray_maintenance())
+                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tray_maintenance()))
 
-        for child in node.children:
-            traverse(child, level + 1)
+            node = node_children[0]
+            for child in node.children:
+                child_node = NodeText(text=child)
+                # print(child)
+                traverse(child_node, level + 1)
 
     traverse(root, 1)
 
     return '\n'.join(tree)
 
+# def generate_behavior_tree(root):
+#     tree = ['Root']
 
-# rootsteps = generate_response(tools)  # list of Node objects
+#     def traverse(node, level):
+#         tree.append('\t'*level + '- ' + node.text)
+#         for child in node.children:
+#             traverse(child, level + 1)
+
+#     traverse(root, 1)
+#     return '\n'.join(tree)
+
+# rootsteps = generate_response()  # list of Node objects
 # root_node = rootsteps[0]  # select the first node as the root of the behavior tree
+# behavior_tree = generate_behavior_tree(root_node)
+# print(behavior_tree)
+
 behavior_tree = generate_behavior_tree(NodeText(text=functions[0]))
 
 output = llm_chain({"input": q}, behavior_tree)
