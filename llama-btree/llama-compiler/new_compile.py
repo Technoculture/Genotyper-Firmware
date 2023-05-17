@@ -130,11 +130,7 @@ class Commands:
         tipRM = ["10ml", "100ml", "1000ml"]
         if self.key_list[2] == "any":
             if "TipRM" in self.key_list[1] and tipRM:
-                answer = (f"This node is {self.key_list[0]}.\
-                    The pipette must be attached to the system before picking up the tip.\
-                    {self.key_list[3]}.\
-                        The zenoh module TipRM is available.\
-                            Proceed to choose and pick-up a tip.", True)
+                answer = (f"This node is {self.key_list[0]}.\nThe pipette must be attached to the system before picking up the tip.\n{self.key_list[3]}.\nProceed to check the TipRM tray module as well.", True)
             else:
                 answer = ("The zenoh TipRM isn't available. Please arrange tip stock in TipRM. Waiting for input TipRM tray to be filled...", False)
         else:
@@ -148,9 +144,7 @@ class Commands:
     def tip_stock_error(self):
 
         if self.key_list[2] == "any":
-            answer = f"This node is {self.key_list[0]}.\
-            {self.key_list[3]}.\
-            Got a Tip stock error."
+            answer = f"This node is {self.key_list[0]}.\n{self.key_list[3]}.\nGot a Tip stock error."
         else:
             answer = "Tip stock error"
 
@@ -162,15 +156,17 @@ class Commands:
         tipRM_tray = ["10ml", "100ml", "1000ml"]
         if "TipRM" in self.key_list[1] and input in tipRM_tray:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    {self.key_list[3]}.\
-                        Tip {input} from zenoh module TipRM is available in the tray.", True)
+                answer = (f"This node is {self.key_list[0]}.\n{self.key_list[3]}.\nTip {input} from zenoh module TipRM is available in the tray.", True)
             else:
                 answer = (f"Tip is available in the tray.",True)
         else:
-            answer = (f"TipRM {input} tip is not available in the tray.\
-                {self.key_list[3]}\
-                    Please place the {input} tip in the tray.", False)
+            answer = (f"TipRM {input} tip is not available in the tray.\n{self.key_list[3]}\nPlease place the {input} tip in the tray.", False)
+
+        return answer
+    
+    def tray_maintainance_error(self):
+
+        answer = f"This node is {self.key_list[0]}.\nzenoh tip is not present in the tray.\n{self.key_list[1]}."
 
         return answer
 
@@ -371,9 +367,7 @@ class Commands:
     
     def load_new_tray_maintainance_error(self):
 
-        answer = f"This node is {self.key_list[0]}.\
-                    zenoh {self.key_list[1]} is not present in the tray.\
-                        Can't load the next tray."
+        answer = f"This node is {self.key_list[0]}.\nNew tray is not available.\n{self.key_list[1]}."
 
         return answer
     

@@ -104,13 +104,21 @@ class NodeText:
         children = []
         children.append('is_tip_available')
         return children
-    
+
+    # def tip_tray(self, answer):
+    #     children = []
+    #     if answer:
+    #         children.append('is_already_in_position')
+    #     else:
+    #         children.append('is_tip_available_in_tray')
+    #     return children
+
     def tip_tray(self, answer):
         children = []
         if answer:
             children.append('is_already_in_position')
         else:
-            children.append('is_tip_available_in_tray')
+            children.append('tray_maintainance_error')
         return children
 
     def slider_pos(self, answer):
@@ -124,65 +132,73 @@ class NodeText:
             children.append('is_slider_position_reached')
         return children
 
-    def pos_reach(self, answer):
-        children = []
-        if answer:
-            children.append('pick_up_tip_using_gantry')
-            children.append('is_caught_tip_firm_and_oriented')
-        else:
-            children.append('move_slider_to_load_position')
-            children.append('move_tip_slider_to_position')
-        return children
+    # def pos_reach(self, answer):
+    #     children = []
+    #     if answer:
+    #         children.append('pick_up_tip_using_gantry')
+    #         children.append('is_caught_tip_firm_and_oriented')
+    #     else:
+    #         children.append('move_slider_to_load_position')
+    #         children.append('move_tip_slider_to_position')
+    #     return children
 
-    def caught_tip(self, answer):
-        children = []
-        if answer:
-            children.append('goto_discard_position')
-            children.append('prepare_to_discard')
-            children.append('eject_tip')
-            children.append('is_discard_tip_successful')
-        else:
-            children.append('is_tip_available_in_tray')
-            children.append('goto_discard_position')
-            children.append('prepare_to_discard')
-            children.append('eject_tip')
-            children.append('is_discard_tip_successful')
-        return children
+    # def caught_tip(self, answer):
+    #     children = []
+    #     if answer:
+    #         children.append('goto_discard_position')
+    #         children.append('prepare_to_discard')
+    #         children.append('eject_tip')
+    #         children.append('is_discard_tip_successful')
+    #     else:
+    #         # children.append('is_tip_available_in_tray')
+    #         children.append('goto_discard_position')
+    #         children.append('prepare_to_discard')
+    #         children.append('eject_tip')
+    #         children.append('is_discard_tip_successful')
+    #         children.append('is_tip_available_in_tray')
+    #     return children
 
-    def discard_tip(self, answer):
-        children = []
-        if answer:
-            children.append('is_discard_success')
-        else:
-            children.append('is_discard_tip_successful')
-        return children
+    # def discard_tip(self, answer):
+    #     children = []
+    #     if answer:
+    #         children.append('is_discard_success')
+    #     else:
+    #         # children.append('is_discard_tip_successful')
+    #         children.append('goto_discard_position')
+    #         children.append('prepare_to_discard')
+    #         children.append('eject_tip')
+    #     return children
 
-    def discard_success(self, answer, tip_tray_info):
-        children = []
-        if tip_tray_info == True:
-            if answer:
-                children.append('load_next_tray')
-                children.append('is_load_new_tray_successful')
-            else:
-                children.append('is_discard_success')
-        else:
-            children.append('is_tip_available_in_tray')
-        return children
+    # def discard_success(self, answer, tip_tray_info):
+    #     children = []
+    #     if tip_tray_info == True:
+    #         if answer:
+    #             children.append('load_next_tray')
+    #             children.append('is_load_new_tray_successful')
+    #         else:
+    #             # children.append('is_discard_success')
+    #             children.append('goto_discard_position')
+    #             children.append('prepare_to_discard')
+    #             children.append('eject_tip')
+    #             children.append('is_tip_available_in_tray')
+    #     else:
+    #         children.append('is_tip_available_in_tray')
+        # return children
 
 
-    def load_tray_success(self, answer):
-        children = []
-        if answer:
-            children.append('load_next_tray')
-            children.append('is_load_new_tray_successful')
-        else:
-            children.append('load_new_tray_maintainance_error')
-        return children
+    # def load_tray_success(self, answer):
+    #     children = []
+    #     if answer:
+    #         children.append('load_next_tray')
+    #         # children.append('is_load_new_tray_successful')
+    #     else:
+    #         children.append('load_new_tray_maintainance_error')
+    #     return children
     
-    def tray_maintenance(self):
-        children = []
-        children.append('load_next_tray')
-        return children
+    # def tray_maintenance(self):
+    #     children = []
+    #     children.append('load_next_tray')
+    #     return children
     
 #     if getattr(Commands(fn_name=node.text,tools=tools), node.text):
 #         func_name = getattr(Commands(fn_name=node.text,tools=tools), node.text)
@@ -204,40 +220,17 @@ class NodeText:
     
 
 functions = ['is_tip_available',
-
-    'tip_stock_error',
-
-    'is_tip_available_in_tray',
-
-    'is_discard_success',
-
-    'is_discard_tip_successful',
-
-    'move_slider_to_load_position',
-
-    'load_next_tray',
-
-    'load_new_tray_maintainance_error',
-
-    'is_already_in_position',
-
-    'move_tip_slider_to_position',
-
-    'is_slider_position_reached',
-
-    'is_load_new_tray_successful',
-
-    'tray_maintainance_error',
-
-    'pick_up_tip_using_gantry',
-
-    'is_caught_tip_firm_and_oriented',
-
-    'goto_discard_position',
-
-    'prepare_to_discard',
-
-    'eject_tip',]
+             'tip_stock_error',
+             'is_tip_available_in_tray',
+             'tray_maintainance_error',
+             'is_already_in_position',
+             'is_slider_position_reached',
+             'is_caught_tip_firm_and_oriented',
+             'is_discard_tip_successful',
+             'is_discard_success',
+             'is_load_new_tray_successful',
+             'load_new_tray_maintainance_error',
+             ]
 
 def generate_behavior_tree(root):
 
@@ -262,6 +255,7 @@ def generate_behavior_tree(root):
             else:
                 tree.append('\t'*level + '- ' + func_name()[0])
             # tree.append("Place the sample in the PCR.")
+            print(tip_tray_info)
 
             if node.text == 'is_tip_available':
                 # x = NodeText(text=node.text, children = NodeText(node.text).tip_avail(func_name()[1]))
@@ -273,24 +267,42 @@ def generate_behavior_tree(root):
                 node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tip_tray(tip_tray_info[0])))
             elif node.text == 'is_already_in_position':
                 node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).slider_pos(func_name(tip_tray_info)[1])))
-            elif node.text == 'is_slider_position_reached':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).pos_reach(func_name(tip_tray_info)[1])))
-            elif node.text == 'is_caught_tip_firm_and_oriented':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).caught_tip(func_name(tip_tray_info)[1])))
-            elif node.text == 'is_discard_tip_successful':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_tip(func_name(tip_tray_info)[1])))
-            elif node.text == 'is_discard_success':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_success(func_name(tip_tray_info)[1], tip_tray_info)))
-            elif node.text == 'is_load_new_tray_successful':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).load_tray_success(func_name(tip_tray_info)[1])))
-            elif node.text == 'load_new_tray_maintainance_error':
-                node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tray_maintenance()))
+            # elif node.text == 'is_slider_position_reached':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).pos_reach(func_name(tip_tray_info)[1])))
+            # elif node.text == 'is_caught_tip_firm_and_oriented':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).caught_tip(func_name(tip_tray_info)[1])))
+            # elif node.text == 'is_discard_tip_successful':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_tip(func_name(tip_tray_info)[1])))
+            # elif node.text == 'is_discard_success':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).discard_success(func_name(tip_tray_info)[1], tip_tray_info)))
+            # elif node.text == 'is_load_new_tray_successful':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).load_tray_success(func_name(tip_tray_info)[1])))
+            # elif node.text == 'load_new_tray_maintainance_error':
+            #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tray_maintenance()))
+        
+        node = node_children[0]
+        print(node_children)
+        print(node.children)
+        if len(tip_tray_info) == 0:
 
-            node = node_children[0]
             for child in node.children:
                 child_node = NodeText(text=child)
                 # print(child)
                 traverse(child_node, level + 1)
+                # if type(func_name()) == tuple
+        else:
+            # (node.children).pop()
+
+            for child in node.children:
+                child_node = NodeText(text=child)
+                # print(child)
+                traverse(child_node, level + 1)
+                # (node.children).pop()
+                
+
+        print(node_children)
+        print(node.children)
+
 
     traverse(root, 1)
 
@@ -314,7 +326,7 @@ def generate_behavior_tree(root):
 
 behavior_tree = generate_behavior_tree(NodeText(text=functions[0]))
 
-output = llm_chain({"input": q}, behavior_tree)
+# output = llm_chain({"input": q}, behavior_tree)
 print(behavior_tree)
 
 
