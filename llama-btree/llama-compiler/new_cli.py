@@ -124,8 +124,10 @@ class NodeText:
     def slider_pos(self, answer):
         children = []
         if answer:
-            children.append('move_tip_slider_to_position')
-            children.append('is_slider_position_reached')
+            # children.append('move_tip_slider_to_position')
+            # children.append('is_slider_position_reached')
+            children.append('pick_up_tip_using_gantry')
+            children.append('is_caught_tip_firm_and_oriented')
         else:
             children.append('move_slider_to_load_position')
             children.append('move_tip_slider_to_position')
@@ -218,7 +220,6 @@ class NodeText:
 #     func_name = getattr(Commands(fn_name=node.text,tools=tools), node.text)
 
     
-
 functions = ['is_tip_available',
              'tip_stock_error',
              'is_tip_available_in_tray',
@@ -239,7 +240,7 @@ def generate_behavior_tree(root):
     # root = NodeText(functions[0])
     node_children = []
     tip_tray_info = []
-
+    children = []
     def traverse(node, level):
         # tip = input("Enter the input tip: ")
         if getattr(Commands(fn_name=node.text,tools=tools), node.text):
@@ -267,6 +268,7 @@ def generate_behavior_tree(root):
                 node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tip_tray(tip_tray_info[0])))
             elif node.text == 'is_already_in_position':
                 node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).slider_pos(func_name(tip_tray_info)[1])))
+                print("round2-",func_name(tip_tray_info)[1])
             # elif node.text == 'is_slider_position_reached':
             #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).pos_reach(func_name(tip_tray_info)[1])))
             # elif node.text == 'is_caught_tip_firm_and_oriented':
@@ -280,25 +282,28 @@ def generate_behavior_tree(root):
             # elif node.text == 'load_new_tray_maintainance_error':
             #     node_children.insert(0, NodeText(text=node.text, children = NodeText(node.text).tray_maintenance()))
         
+
         node = node_children[0]
-        print(node_children)
-        print(node.children)
+        print("round1-",node_children)
+        print("round1-",node.children)
+        # children[0].insert(node.children)
         if len(tip_tray_info) == 0:
 
             for child in node.children:
                 child_node = NodeText(text=child)
                 # print(child)
                 traverse(child_node, level + 1)
-                # if type(func_name()) == tuple
         else:
-            # (node.children).pop()
-
+            print("round2-",node.children)
+            # (node.children).pop(0) # important
+            # count = 0
             for child in node.children:
+
                 child_node = NodeText(text=child)
                 # print(child)
+                (node.children).pop(0)
                 traverse(child_node, level + 1)
-                # (node.children).pop()
-                
+
 
         print(node_children)
         print(node.children)

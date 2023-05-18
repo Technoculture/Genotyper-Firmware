@@ -188,7 +188,7 @@ class Commands:
 
     def is_already_in_position(self, tip_tray_info):
 
-        if tip_tray_info == True and "TipRM" in self.key_list[1]:
+        if tip_tray_info == True and ["TipRM","Gantry"] in self.key_list[1]:
             if self.key_list[2] == "any":
                 answer = (f"This node is {self.key_list[0]}.\
                     Pipette is present, Pipette is the actively mounted tool.\
