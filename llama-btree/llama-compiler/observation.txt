@@ -1,0 +1,7 @@
+observation_texts123_temp0: 1st three json outputs are for three inputs 10ml, 100ml, 1000ml at 0.0 temperature.
+LLM responds follows b-tree better for task planning with different input examples.
+observation_texts456_temp1: next three json outputs are for three inputs 10ml, 100ml, 1000ml at 1.0 temperature. Server responds slower at temperature 1.0.
+LLM responds follows b-tree better for task planning with different input examples and creates feedback loops to diffrent path if the error occurs.
+observation_texts789_temp2: next three json outputs are for three inputs 10ml, 100ml, 1000ml at 1.0 temperature. Server responds slowest at temperature 2.0.
+LLM is hallucinating. It starts with 2 tools but then responds meaningless steps. At 100ml input it tried to recognize wrong tools created by itself as invalid tools.
+100ml is the best output.
