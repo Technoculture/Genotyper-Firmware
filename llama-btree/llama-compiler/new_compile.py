@@ -174,11 +174,7 @@ class Commands:
 
         if tip_tray_info == True and "Pipette" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Moved tip slider to load position."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nMoved tip slider to load position."
             else:
                 answer = f"Pipette is present, Pipette is the actively mounted tool. Moved tip slider to load position."
         else:
@@ -190,11 +186,7 @@ class Commands:
 
         if tip_tray_info == True and ["TipRM","Gantry"] in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Tip slider is already in position.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nTip slider is already in position.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. Tip slider is already in position.", True)
         else:
@@ -206,11 +198,7 @@ class Commands:
 
         if tip_tray_info == True and "Pipette" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Moved tip slider to load position."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nMoved tip slider to load position."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Moved tip slider to position."
         else:
@@ -221,13 +209,9 @@ class Commands:
 
     def is_slider_position_reached(self, tip_tray_info):
 
-        if tip_tray_info == True and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Tip slider position was reached.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nTip slider position was reached.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. Tip slider position was reached.", True)
         else:
@@ -240,28 +224,21 @@ class Commands:
 
         if tip_tray_info == True and "Gantry" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Picked up tip using gantry."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nPicked up tip using gantry."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Picked up tip using gantry."
         else:
-            answer = f"{self.key_list[3]}."
+            answer = f"{self.key_list[3]}. Gantry is mising."
 
         return answer
-    
-    
+
+
     def is_caught_tip_firm_and_oriented(self, tip_tray_info):
 
-        if tip_tray_info == True and "Pipette" in self.key_list[1]:
+        # if tip_tray_info == True and "Pipette" in self.key_list[1]:
+        if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Caught tip is firm and oriented.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nCaught tip is firm and oriented.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. Caught tip is firm and oriented.", True)
         else:
@@ -273,11 +250,7 @@ class Commands:
 
         if tip_tray_info == True and "Gantry" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Moved the tip to discard position."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nMoved the tip to discard position."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Moved the tip to discard position."
         else:
@@ -289,11 +262,7 @@ class Commands:
 
         if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Prepared to discard the tip."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nPrepared to discard the tip."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Prepared to discard the tip."
         else:
@@ -305,11 +274,7 @@ class Commands:
 
         if tip_tray_info == True and self.key_list[1] == ["Pipette", "TipRM"]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Ejected the tip."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nEjected the tip."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Ejected the tip."
         else:
@@ -321,11 +286,7 @@ class Commands:
 
         if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Discarded tip successfully.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nDiscarded tip successfully.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. Discarded tip successfully.", True)
         else:
@@ -337,11 +298,7 @@ class Commands:
 
         if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                The discarded tip is in the tray.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nThe discarded tip is in the tray.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. The discarded tip is in the tray.", True)
         else:
@@ -353,11 +310,7 @@ class Commands:
 
         if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tip is present in the tray of {self.key_list[1]}.\
-                                Load the next tray."
+                answer = f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tip is present in the tray of {self.key_list[1]}.\nLoad the next tray."
             else:
                 answer = "Pipette is present, Pipette is the actively mounted tool. Load the next tray."
         else:
@@ -375,11 +328,7 @@ class Commands:
 
         if tip_tray_info == True and "TipRM" in self.key_list[1]:
             if self.key_list[2] == "any":
-                answer = (f"This node is {self.key_list[0]}.\
-                    Pipette is present, Pipette is the actively mounted tool.\
-                        {self.key_list[3]}.\
-                            zenoh tips from {self.key_list[1]} is present in the tray.\
-                                Loaded the new tray successfully.", True)
+                answer = (f"This node is {self.key_list[0]}.\nPipette is present, Pipette is the actively mounted tool.\nzenoh tips from {self.key_list[1]} is present in the tray.\nLoaded the new tray successfully.", True)
             else:
                 answer = ("Pipette is present, Pipette is the actively mounted tool. Loaded the new tray successfully.", True)
         else:
