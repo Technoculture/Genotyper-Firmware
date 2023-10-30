@@ -1,0 +1,10 @@
+C:\Users\user\Documents\Genotyper-Firmware\PSOC\samples\OP_AMP.cydsn\OP_AMP.cyprj|61651eb8-2322-4d76-b00b-485f55bb771f
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|f25ffe74-a4e1-42be-bd4d-3a3004fe1b60
+C:\Users\user\Documents\PSoC Creator\4.4\Downloads ( 4.4).cylib\Downloads ( 4.4).cyprj|428954f3-e491-46fe-b49d-e794ede974cd
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|addfe707-85b2-40de-8218-c086cff32ac9
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|38e50fa5-b73c-46b3-8e5b-8431b0fb734a
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|f8bd4588-a471-495c-a8f6-915bc4d55c5d
+C:\Users\user\Documents\Genotyper-Firmware\PSOC\samples\Trans_Impedance_Amplifier.cydsn\Trans_Impedance_Amplifier.cyprj|ece770c6-45ff-411a-bd7d-edcf009e71b8
+C:\Users\user\Documents\Genotyper-Firmware\PSOC\samples\LED_Brightness_ADC_PWM.cydsn\LED_Brightness_ADC_PWM.cyprj|1731e75a-4741-44c9-be27-3716ec766b1e
+C:\Users\user\Documents\Genotyper-Firmware\PSOC\samples\USB_Serial.cydsn\USB_Serial.cyprj|b9d88fd9-2f53-465f-b3d7-0c321642a3c4
+C:\Users\user\Documents\Genotyper-Firmware\PSOC\samples\LED_Blink.cydsn\LED_Blink.cyprj|9f9d0b6c-7104-49b5-8851-b4e4d5d0d13e
