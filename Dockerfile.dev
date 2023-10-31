@@ -1,0 +1,18 @@
+FROM python:3.10
+
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    export PATH="$HOME/.cargo/bin:$PATH" && \
+    rustup --version && \
+    rustc --version && \
+    cargo --version
+
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /usr/src/workspace
+
+COPY . .
+
+RUN cargo install cargo-watch
+
+CMD ["bash"]
+

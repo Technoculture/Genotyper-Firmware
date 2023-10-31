@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "Debug (OpenOCD)",
+      "servertype": "openocd",
+      "cwd": "${workspaceRoot}",
+      "executable": "../target/thumbv7em-none-eabihf/debug/slider",
+      "preLaunchTask": "build",
+      "device": "STM32F401RET6U",
+      "configFiles": [
+        "openocd.cfg",
+      ],
+      "svdFile": "${workspaceRoot}/STM32F401.svd",
+    }
+  ]
+}

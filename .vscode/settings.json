@@ -1,20 +1,13 @@
 {
-  "python.testing.pytestArgs": [
-    "tests"
-  ],
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
-  "python.formatting.provider": "autopep8",
-  "python.analysis.typeCheckingMode": "strict",
-  "python.linting.enabled": true,
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/__pycache__": true,
-    "**/.pytest_cache": true,
-  }
+  "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+  "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
+  "rust-analyzer.inlayHints.expressionAdjustmentHints.enable": "always",
+  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
+  "rust-analyzer.inlayHints.reborrowHints.enable": "always",
+  "rust-analyzer.inlayHints.typeHints.hideClosureInitialization": true,
+  "rust-analyzer.inlayHints.typeHints.hideNamedConstructor": true,
+  "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+  // "editor.inlayHints.enabled": "offUnlessPressed",
+  "editor.inlayHints.enabled": "on",
+  "python.analysis.typeCheckingMode": "basic"
 }

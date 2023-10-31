@@ -1,0 +1,13 @@
+torch
+openai
+langchain
+graphviz
+langchain-visualizer
+pydantic
+wandb
+pandas
+spacy
+textstat
+transformers
+google-search-results
+

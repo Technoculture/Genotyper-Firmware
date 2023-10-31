@@ -1,0 +1,11 @@
+session_name: my-session
+windows:
+  - window_name: Robot
+    layout: tiled
+    panes:
+      - shell_command:
+          - pipenv run python incomming_swabs.py --speedup-factor 300
+      - shell_command:
+          - pipenv run python sample_prep.py
+      - shell_command:
+          - pipenv run python liquid_handler.py
