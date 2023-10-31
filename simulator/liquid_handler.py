@@ -1,7 +1,12 @@
 import zenoh, time
 
+from gensi.formats import Message
+
 def listener(sample):
-    print(f"Received {sample.kind} ('{sample.key_expr}': '{sample.payload.decode('utf-8')}')")
+    msg_str = sample.payload.decode('utf-8')
+    received_msg = Message.parse_raw(msg_str)
+    print(f"Received {sample.kind} ('{sample.key_expr}': '{received_msg}')")
+
 
 if __name__ == "__main__":
     session = zenoh.open()

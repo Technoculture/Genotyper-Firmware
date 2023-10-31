@@ -4,6 +4,8 @@ import time
 import math
 import typer
 
+from gensi.formats import Message
+
 app = typer.Typer()
 
 @app.command()
@@ -32,7 +34,8 @@ def simulate_incomming_samples(median: int = 300, sigma: float = 1.2, min_time: 
     
     while True:
         t = get_sample_at_random()
-        buf = f"{t}"
+        msg = Message(data=t)
+        buf = msg.model_dump_json()
         print(f"Putting Data ('{key}': '{buf}')...")
         pub.put(buf)
 
