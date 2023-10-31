@@ -4,7 +4,7 @@ import time
 import math
 import typer
 
-from gensi.formats import Message
+from gensi.formats import Message, Sample
 
 app = typer.Typer()
 
@@ -31,13 +31,17 @@ def simulate_incomming_samples(median: int = 300, sigma: float = 1.2, min_time: 
     session = zenoh.open()
     key = 'incomming_swab/push'
     pub = session.declare_publisher(key)
-    
+
     while True:
         t = get_sample_at_random()
-        msg = Message(data=t)
-        buf = msg.model_dump_json()
-        print(f"Putting Data ('{key}': '{buf}')...")
+        sample = Sample()
+        buf = sample.model_dump_json()
+        print(f"Putting Data ('{key}': '{buf}')")
         pub.put(buf)
 
 if __name__ == "__main__":
+    print("Waiting for other apps to get started.")
+    time.sleep(3)
+    print("App Started.")
+
     app()
