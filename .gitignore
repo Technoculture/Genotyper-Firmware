@@ -27,3 +27,4 @@ target/
 !.vscode/tasks.json
 !.vscode/extensions.json
 **/*.env
+*.lock
